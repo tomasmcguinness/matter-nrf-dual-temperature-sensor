@@ -16,11 +16,30 @@
 
 #include <zephyr/logging/log.h>
 
+#include <app-common/zap-generated/attributes/Accessors.h>
+
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip;
 using namespace ::chip::app;
 using namespace ::chip::DeviceLayer;
+
+k_timer sSensorTimer;
+
+void SensorTimerHandler(k_timer *timer)
+{
+    Nrf::PostTask([] { AppTask::SensorMeasureHandler(); });
+}
+
+void StartSensorTimer(uint32_t aTimeoutMs)
+{
+    k_timer_start(&sSensorTimer, K_MSEC(aTimeoutMs), K_MSEC(aTimeoutMs));
+}
+
+void StopSensorTimer()
+{
+    k_timer_stop(&sSensorTimer);
+}
 
 CHIP_ERROR AppTask::Init()
 {
@@ -36,6 +55,9 @@ CHIP_ERROR AppTask::Init()
 	 * state. */
 	ReturnErrorOnFailure(Nrf::Matter::RegisterEventHandler(Nrf::Board::DefaultMatterEventHandler, 0));
 
+   	k_timer_init(&sSensorTimer, &SensorTimerHandler, nullptr);
+    k_timer_user_data_set(&sSensorTimer, this);
+
 	return Nrf::Matter::StartServer();
 }
 
@@ -48,4 +70,20 @@ CHIP_ERROR AppTask::StartApp()
 	}
 
 	return CHIP_NO_ERROR;
+}
+
+void AppTask::SensorActivateHandler()
+{
+    StartSensorTimer(500);
+}
+
+void AppTask::SensorDeactivateHandler()
+{
+    StopSensorTimer();
+}
+
+void AppTask::SensorMeasureHandler()
+{
+    chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, int16_t(rand() % 5000));
+    chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(2, int16_t(rand() % 5000));
 }

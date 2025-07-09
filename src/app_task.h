@@ -18,6 +18,10 @@ public:
 		return sAppTask;
 	};
 
+	static void SensorActivateHandler();
+	static void SensorDeactivateHandler();
+	static void SensorMeasureHandler();
+
 	CHIP_ERROR StartApp();
 
 private:
