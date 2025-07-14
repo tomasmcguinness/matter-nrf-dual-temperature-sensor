@@ -48,6 +48,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId) {
   case app::Clusters::GroupKeyManagement::Id:
     emberAfGroupKeyManagementClusterInitCallback(endpoint);
     break;
+  case app::Clusters::IcdManagement::Id:
+    emberAfIcdManagementClusterInitCallback(endpoint);
+    break;
   case app::Clusters::Identify::Id:
     emberAfIdentifyClusterInitCallback(endpoint);
     break;
@@ -107,6 +110,11 @@ emberAfGeneralDiagnosticsClusterInitCallback(EndpointId endpoint) {
 }
 void __attribute__((weak))
 emberAfGroupKeyManagementClusterInitCallback(EndpointId endpoint) {
+  // To prevent warning
+  (void)endpoint;
+}
+void __attribute__((weak))
+emberAfIcdManagementClusterInitCallback(EndpointId endpoint) {
   // To prevent warning
   (void)endpoint;
 }

@@ -4,6 +4,13 @@
  */
 
 / {
+	chosen {
+		nordic,pm-ext-flash = &mx25r64;
+		zephyr,entropy = &rng;
+	};
+};
+
+/*
 	power {
 		compatible = "gpio-keys";
 		temperature_divider_power: temperature_divider_power {
@@ -15,13 +22,9 @@
 	zephyr,user {
 		io-channels = <&adc 0>, <&adc 1>;
 	};
+	*/
 
-	chosen {
-		nordic,pm-ext-flash = &mx25r64;
-		zephyr,entropy = &rng;
-	};
-};
-
+/*
 &adc {
 	#address-cells = <1>;
 	#size-cells = <0>;
@@ -46,12 +49,22 @@
 		zephyr,oversampling = <8>;
 	};
 };
+*/
 
 /* Disable unused peripherals to reduce power consumption */
+&adc {
+	status = "disabled";
+};
+&uart0 {
+	status = "disabled";
+};
 &uart1 {
 	status = "disabled";
 };
 &i2c0 {
+	status = "disabled";
+};
+&i2c1 {
 	status = "disabled";
 };
 &pwm0 {
@@ -60,22 +73,18 @@
 &usbd {
 	status = "disabled";
 };
-&qspi {
+/*&qspi {
 	status = "disabled";
-};
-
+};*/
 &spi0 {
 	status = "disabled";
 };
-
 &spi1 {
 	status = "disabled";
 };
-
 &spi2 {
 	status = "disabled";
 };
-
 &spi3 {
 	status = "disabled";
 };
