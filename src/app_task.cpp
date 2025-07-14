@@ -48,12 +48,6 @@ void StopSensorTimer()
 
 CHIP_ERROR AppTask::Init()
 {
-	// static struct pm_notifier notifier = {
-	// 	.state_entry = pm_state_enter_callback
-	// };
-
-	// pm_notifier_register(&notifier);
-
 	/* Initialize Matter stack */
 	ReturnErrorOnFailure(Nrf::Matter::PrepareServer());
 
@@ -78,17 +72,6 @@ CHIP_ERROR AppTask::Init()
 CHIP_ERROR AppTask::StartApp()
 {
 	ReturnErrorOnFailure(Init());
-
-	// LOG_ERR("Getting QSPI.");
-
-	// const auto *qspi_dev = DEVICE_DT_GET(DT_INST(0, nordic_qspi_nor));
-	// if (device_is_ready(qspi_dev))
-	// {
-	// 	LOG_ERR("Suspending QSPI.");
-    // 	// Put the peripheral into suspended state.
-    // 	pm_device_action_run(qspi_dev, PM_DEVICE_ACTION_SUSPEND);
-	// 	LOG_ERR("QSPI suspended.");
-	// }
 
 	while (true)
 	{
