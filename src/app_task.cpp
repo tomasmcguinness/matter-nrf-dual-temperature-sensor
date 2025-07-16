@@ -32,18 +32,7 @@ k_timer sSensorTimer;
 
 void SensorTimerHandler(k_timer *timer)
 {
-	Nrf::PostTask([]
-				  { AppTask::SensorMeasureHandler(); });
-}
-
-void StartSensorTimer(uint32_t aTimeoutMs)
-{
-	k_timer_start(&sSensorTimer, K_MSEC(aTimeoutMs), K_MSEC(aTimeoutMs));
-}
-
-void StopSensorTimer()
-{
-	k_timer_stop(&sSensorTimer);
+	Nrf::PostTask([] { AppTask::SensorMeasureHandler(); });
 }
 
 CHIP_ERROR AppTask::Init()
@@ -71,7 +60,9 @@ CHIP_ERROR AppTask::Init()
 
 CHIP_ERROR AppTask::StartApp()
 {
-	ReturnErrorOnFailure(Init());
+	ReturnErrorOnFailure(Init());	
+
+	k_timer_start(&sSensorTimer, K_MSEC(30000), K_MSEC(30000));
 
 	while (true)
 	{
@@ -79,16 +70,6 @@ CHIP_ERROR AppTask::StartApp()
 	}
 
 	return CHIP_NO_ERROR;
-}
-
-void AppTask::SensorActivateHandler()
-{
-	StartSensorTimer(10000);
-}
-
-void AppTask::SensorDeactivateHandler()
-{
-	StopSensorTimer();
 }
 
 void AppTask::SensorMeasureHandler()

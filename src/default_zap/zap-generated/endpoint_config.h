@@ -56,7 +56,7 @@
   {}
 
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 123
+#define GENERATED_ATTRIBUTE_COUNT 120
 #define GENERATED_ATTRIBUTES                                                   \
   {                                                                            \
                                                                                \
@@ -303,14 +303,6 @@
         {ZAP_SIMPLE_DEFAULT(4), 0x0000FFFD, 2, ZAP_TYPE(INT16U),               \
          0}, /* ClusterRevision */                                             \
                                                                                \
-        /* Endpoint: 1, Cluster: On/Off (server) */                            \
-        {ZAP_SIMPLE_DEFAULT(0), 0x00000000, 1, ZAP_TYPE(BOOLEAN),              \
-         0}, /* OnOff */                                                       \
-        {ZAP_SIMPLE_DEFAULT(0), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),             \
-         0}, /* FeatureMap */                                                  \
-        {ZAP_SIMPLE_DEFAULT(6), 0x0000FFFD, 2, ZAP_TYPE(INT16U),               \
-         0}, /* ClusterRevision */                                             \
-                                                                               \
         /* Endpoint: 1, Cluster: Descriptor (server) */                        \
         {ZAP_EMPTY_DEFAULT(), 0x00000000, 0, ZAP_TYPE(ARRAY),                  \
          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)}, /* DeviceTypeList */           \
@@ -397,10 +389,6 @@
       (EmberAfGenericClusterFunction)emberAfIdentifyClusterServerInitCallback, \
       (EmberAfGenericClusterFunction)                                          \
           MatterIdentifyClusterServerAttributeChangedCallback,                 \
-  };                                                                           \
-  const EmberAfGenericClusterFunction chipFuncArrayOnOffServer[] = {           \
-      (EmberAfGenericClusterFunction)emberAfOnOffClusterServerInitCallback,    \
-      (EmberAfGenericClusterFunction)MatterOnOffClusterServerShutdownCallback, \
   };
 
 // clang-format off
@@ -481,14 +469,8 @@
   0x00000000 /* Identify */, \
   0x00000040 /* TriggerEffect */, \
   chip::kInvalidCommandId /* end of list */, \
-  /* Endpoint: 1, Cluster: On/Off (server) */\
-  /*   AcceptedCommandList (index=55) */ \
-  0x00000000 /* Off */, \
-  0x00000001 /* On */, \
-  0x00000002 /* Toggle */, \
-  chip::kInvalidCommandId /* end of list */, \
   /* Endpoint: 2, Cluster: Identify (server) */\
-  /*   AcceptedCommandList (index=59) */ \
+  /*   AcceptedCommandList (index=55) */ \
   0x00000000 /* Identify */, \
   0x00000040 /* TriggerEffect */, \
   chip::kInvalidCommandId /* end of list */, \
@@ -497,7 +479,7 @@
 // clang-format on
 
 // This is an array of EmberAfCluster structures.
-#define GENERATED_CLUSTER_COUNT 19
+#define GENERATED_CLUSTER_COUNT 18
 // clang-format off
 #define GENERATED_CLUSTERS { \
   { \
@@ -670,22 +652,9 @@
       .eventCount = 0, \
     },\
   { \
-      /* Endpoint: 1, Cluster: On/Off (server) */ \
-      .clusterId = 0x00000006, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(94), \
-      .attributeCount = 3, \
-      .clusterSize = 7, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION), \
-      .functions = chipFuncArrayOnOffServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 55 ), \
-      .generatedCommandList = nullptr, \
-      .eventList = nullptr, \
-      .eventCount = 0, \
-    },\
-  { \
       /* Endpoint: 1, Cluster: Descriptor (server) */ \
       .clusterId = 0x0000001D, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(97), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(94), \
       .attributeCount = 6, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -698,7 +667,7 @@
   { \
       /* Endpoint: 1, Cluster: Temperature Measurement (server) */ \
       .clusterId = 0x00000402, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(103), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(100), \
       .attributeCount = 5, \
       .clusterSize = 12, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -711,12 +680,12 @@
   { \
       /* Endpoint: 2, Cluster: Identify (server) */ \
       .clusterId = 0x00000003, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(108), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(105), \
       .attributeCount = 4, \
       .clusterSize = 9, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), \
       .functions = chipFuncArrayIdentifyServer, \
-      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 59 ), \
+      .acceptedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 55 ), \
       .generatedCommandList = nullptr, \
       .eventList = nullptr, \
       .eventCount = 0, \
@@ -724,7 +693,7 @@
   { \
       /* Endpoint: 2, Cluster: Descriptor (server) */ \
       .clusterId = 0x0000001D, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(112), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(109), \
       .attributeCount = 6, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -737,7 +706,7 @@
   { \
       /* Endpoint: 2, Cluster: Temperature Measurement (server) */ \
       .clusterId = 0x00000402, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(118), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(115), \
       .attributeCount = 5, \
       .clusterSize = 12, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -751,13 +720,13 @@
 
 // clang-format on
 
-#define ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT 18
+#define ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT 17
 
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                               \
   {                                                                            \
-    {ZAP_CLUSTER_INDEX(0), 12, 90}, {ZAP_CLUSTER_INDEX(12), 4, 28},            \
-        {ZAP_CLUSTER_INDEX(16), 3, 21},                                        \
+    {ZAP_CLUSTER_INDEX(0), 12, 90}, {ZAP_CLUSTER_INDEX(12), 3, 21},            \
+        {ZAP_CLUSTER_INDEX(15), 3, 21},                                        \
   }
 
 // Largest attribute size is needed for various buffers
@@ -770,7 +739,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (35)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (139)
+#define ATTRIBUTE_MAX_SIZE (132)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (3)

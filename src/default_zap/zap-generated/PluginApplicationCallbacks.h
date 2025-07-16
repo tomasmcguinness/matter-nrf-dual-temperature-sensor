@@ -20,7 +20,6 @@
 #pragma once
 
 void MatterIdentifyPluginServerInitCallback();
-void MatterOnOffPluginServerInitCallback();
 void MatterDescriptorPluginServerInitCallback();
 void MatterAccessControlPluginServerInitCallback();
 void MatterBasicInformationPluginServerInitCallback();
@@ -36,7 +35,6 @@ void MatterTemperatureMeasurementPluginServerInitCallback();
 
 #define MATTER_PLUGINS_INIT                                                    \
   MatterIdentifyPluginServerInitCallback();                                    \
-  MatterOnOffPluginServerInitCallback();                                       \
   MatterDescriptorPluginServerInitCallback();                                  \
   MatterAccessControlPluginServerInitCallback();                               \
   MatterBasicInformationPluginServerInitCallback();                            \

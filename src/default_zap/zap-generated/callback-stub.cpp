@@ -63,9 +63,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId) {
   case app::Clusters::OtaSoftwareUpdateRequestor::Id:
     emberAfOtaSoftwareUpdateRequestorClusterInitCallback(endpoint);
     break;
-  case app::Clusters::OnOff::Id:
-    emberAfOnOffClusterInitCallback(endpoint);
-    break;
   case app::Clusters::OperationalCredentials::Id:
     emberAfOperationalCredentialsClusterInitCallback(endpoint);
     break;
@@ -135,11 +132,6 @@ emberAfOtaSoftwareUpdateProviderClusterInitCallback(EndpointId endpoint) {
 }
 void __attribute__((weak))
 emberAfOtaSoftwareUpdateRequestorClusterInitCallback(EndpointId endpoint) {
-  // To prevent warning
-  (void)endpoint;
-}
-void __attribute__((weak))
-emberAfOnOffClusterInitCallback(EndpointId endpoint) {
   // To prevent warning
   (void)endpoint;
 }
