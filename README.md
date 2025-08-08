@@ -1,4 +1,0 @@
-# Matter Dual Temperature Sensor
-
-
-
