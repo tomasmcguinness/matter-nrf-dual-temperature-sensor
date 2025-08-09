@@ -65,6 +65,7 @@ CHIP_ERROR AppTask::StartApp()
 
 void AppTask::SensorMeasureHandler()
 {
-    chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, int16_t(rand() % 5000));
-    chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(2,  int16_t(rand() % 5000));
+	//LOG_INF("Updating temperatures...");
+    //chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, int16_t(rand() % 5000));
+    //chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(2,  int16_t(rand() % 5000));
 }
