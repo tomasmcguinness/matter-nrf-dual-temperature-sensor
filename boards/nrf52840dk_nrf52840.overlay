@@ -23,6 +23,9 @@
 };
 
 /* Disable unused peripherals to reduce power consumption */
+&qspi {
+	status = "disabled";
+};
 &adc {
 	status = "disabled";
 };
@@ -36,6 +39,9 @@
 	status = "disabled";
 };
 &spi1 {
+	status = "disabled";
+};
+&spi2 {
 	status = "disabled";
 };
 &spi3 {
