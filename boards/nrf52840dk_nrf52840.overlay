@@ -8,6 +8,14 @@
 	 	nordic,pm-ext-flash = &mx25r64;
 	};
 
+	power {
+		compatible = "gpio-keys";
+		temperature_divider_power: temperature_divider_power {
+			gpios = <&gpio1 14 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>;
+			label = "Temperature Divider Power";
+		};
+	};
+
 	zephyr,user {
 		io-channels = <&adc 0>, <&adc 1>, <&adc 2>;
 	};

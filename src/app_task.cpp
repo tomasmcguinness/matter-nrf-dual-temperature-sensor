@@ -25,6 +25,7 @@
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/adc.h>
+#include <zephyr/drivers/gpio.h>
 #include <zephyr/kernel.h>
 #include <math.h>
 
@@ -39,6 +40,8 @@ k_timer sSensorTimer;
 #define DT_SPEC_AND_COMMA(node_id, prop, idx) ADC_DT_SPEC_GET_BY_IDX(node_id, idx),
 
 static const struct adc_dt_spec adc_channels[] = {DT_FOREACH_PROP_ELEM(DT_PATH(zephyr_user), io_channels, DT_SPEC_AND_COMMA)};
+
+#define TEMPERATURE_DIVIDER_POWER_NODE DT_NODELABEL(temperature_divider_power)
 
 #define THERMISTORNOMINAL 10000
 #define TEMPERATURENOMINAL 25
@@ -57,6 +60,8 @@ struct adc_sequence temperature_sequence = {
 float mv_per_lsb = 3000.0F / 4096.0F;	   // 0.6 / (1/5) = 3
 //float batt_mv_per_lsb = 3600.0F / 4096.0F; // 0.6 / (1/6) = 3.6
 
+static const struct gpio_dt_spec temperatures_divider_power = GPIO_DT_SPEC_GET(TEMPERATURE_DIVIDER_POWER_NODE, gpios);
+
 void SensorTimerHandler(k_timer *timer)
 {
 	Nrf::PostTask([]
@@ -74,12 +79,13 @@ CHIP_ERROR AppTask::Init()
 		return CHIP_ERROR_INCORRECT_STATE;
 	}
 
-	/* Register Matter event handler that controls the connectivity status LED based on the captured Matter network
-	 * state. */
+	/* Register Matter event handler that controls the connectivity status LED based on the captured Matter network state. */
 	ReturnErrorOnFailure(Nrf::Matter::RegisterEventHandler(Nrf::Board::DefaultMatterEventHandler, 0));
 
 	k_timer_init(&sSensorTimer, &SensorTimerHandler, nullptr);
 	k_timer_user_data_set(&sSensorTimer, this);
+
+	// TODO Start this timer when we're actually commissioned and connected to a network.
 	k_timer_start(&sSensorTimer, K_MSEC(5000), K_MSEC(5000));
 
 	int err;
@@ -101,6 +107,19 @@ CHIP_ERROR AppTask::Init()
 		}
 
 		LOG_INF("Setup channel #%d", i);
+	}
+
+	if (!gpio_is_ready_dt(&temperatures_divider_power))
+	{
+		LOG_ERR("Cannot configure Divider Power switch (err: %d)", err);
+		return CHIP_ERROR_INTERNAL;
+	}
+
+	err = gpio_pin_configure_dt(&temperatures_divider_power, GPIO_OUTPUT_INACTIVE);
+	if (err != 0)
+	{
+		LOG_ERR("Configuring Divider Power pin failed (err: %d)", err);
+		return CHIP_ERROR_INTERNAL;
 	}
 
 	return Nrf::Matter::StartServer();
@@ -163,8 +182,23 @@ static uint16_t read_temperature(int i)
 
 void AppTask::SensorMeasureHandler()
 {
-	LOG_INF("Updating temperatures...");
+	LOG_INF("Reading temperatures...");
 
-	chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, read_temperature(0));
-	chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(2, read_temperature(1));
+	// Switch on the power pin.
+	//
+	gpio_pin_set_dt(&temperatures_divider_power, 1);
+
+	// Let the voltage stabalise
+	//
+	k_sleep(K_MSEC(100));
+
+	uint16_t temperature_1 = read_temperature(0);
+	uint16_t temperature_2 = read_temperature(1);
+
+	// Switch off the power pin.
+	//
+	gpio_pin_set_dt(&temperatures_divider_power, 0);
+
+	chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, temperature_1);
+	chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(2, temperature_2);
 }
