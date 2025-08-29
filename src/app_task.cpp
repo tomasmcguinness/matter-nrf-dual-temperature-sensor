@@ -41,7 +41,8 @@ k_timer sSensorTimer;
 
 static const struct adc_dt_spec adc_channels[] = {DT_FOREACH_PROP_ELEM(DT_PATH(zephyr_user), io_channels, DT_SPEC_AND_COMMA)};
 
-#define TEMPERATURE_DIVIDER_POWER_NODE DT_NODELABEL(temperature_divider_power)
+#define PROBE_1_DIVIDER_POWER_NODE DT_NODELABEL(probe_1_divider_power)
+#define PROBE_2_DIVIDER_POWER_NODE DT_NODELABEL(probe_2_divider_power)
 
 #define THERMISTORNOMINAL 10000
 #define TEMPERATURENOMINAL 25
@@ -57,10 +58,11 @@ struct adc_sequence temperature_sequence = {
 	.calibrate = true,
 };
 
-float mv_per_lsb = 3000.0F / 4096.0F;	   // 0.6 / (1/5) = 3
-//float batt_mv_per_lsb = 3600.0F / 4096.0F; // 0.6 / (1/6) = 3.6
+float mv_per_lsb = 3000.0F / 4096.0F; // 0.6 / (1/5) = 3
+// float batt_mv_per_lsb = 3600.0F / 4096.0F; // 0.6 / (1/6) = 3.6
 
-static const struct gpio_dt_spec temperatures_divider_power = GPIO_DT_SPEC_GET(TEMPERATURE_DIVIDER_POWER_NODE, gpios);
+static const struct gpio_dt_spec probe_1_divider_power = GPIO_DT_SPEC_GET(PROBE_1_DIVIDER_POWER_NODE, gpios);
+static const struct gpio_dt_spec probe_2_divider_power = GPIO_DT_SPEC_GET(PROBE_2_DIVIDER_POWER_NODE, gpios);
 
 void SensorTimerHandler(k_timer *timer)
 {
@@ -109,16 +111,29 @@ CHIP_ERROR AppTask::Init()
 		LOG_INF("Setup channel #%d", i);
 	}
 
-	if (!gpio_is_ready_dt(&temperatures_divider_power))
+	if (!gpio_is_ready_dt(&probe_1_divider_power))
 	{
-		LOG_ERR("Cannot configure Divider Power switch (err: %d)", err);
+		LOG_ERR("Cannot configure Probe 1 Divider Power switch (err: %d)", err);
 		return CHIP_ERROR_INTERNAL;
 	}
 
-	err = gpio_pin_configure_dt(&temperatures_divider_power, GPIO_OUTPUT_INACTIVE);
+	err = gpio_pin_configure_dt(&probe_1_divider_power, GPIO_OUTPUT_INACTIVE);
 	if (err != 0)
 	{
-		LOG_ERR("Configuring Divider Power pin failed (err: %d)", err);
+		LOG_ERR("Configuring Probe 1 Divider Power pin failed (err: %d)", err);
+		return CHIP_ERROR_INTERNAL;
+	}
+
+	if (!gpio_is_ready_dt(&probe_2_divider_power))
+	{
+		LOG_ERR("Cannot configure Probe 2 Divider Power switch (err: %d)", err);
+		return CHIP_ERROR_INTERNAL;
+	}
+
+	err = gpio_pin_configure_dt(&probe_2_divider_power, GPIO_OUTPUT_INACTIVE);
+	if (err != 0)
+	{
+		LOG_ERR("Configuring Probe 2 Divider Power pin failed (err: %d)", err);
 		return CHIP_ERROR_INTERNAL;
 	}
 
@@ -186,18 +201,29 @@ void AppTask::SensorMeasureHandler()
 
 	// Switch on the power pin.
 	//
-	gpio_pin_set_dt(&temperatures_divider_power, 1);
+	gpio_pin_set_dt(&probe_1_divider_power, 1);
 
 	// Let the voltage stabalise
 	//
 	k_sleep(K_MSEC(100));
-
 	uint16_t temperature_1 = read_temperature(0);
+
+	// Switch off the power pin.
+	//
+	gpio_pin_set_dt(&probe_1_divider_power, 0);
+
+	// Switch on the power pin.
+	//
+	gpio_pin_set_dt(&probe_2_divider_power, 1);
+
+	// Let the voltage stabalise
+	//
+	k_sleep(K_MSEC(100));
 	uint16_t temperature_2 = read_temperature(1);
 
 	// Switch off the power pin.
 	//
-	gpio_pin_set_dt(&temperatures_divider_power, 0);
+	gpio_pin_set_dt(&probe_2_divider_power, 0);
 
 	chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, temperature_1);
 	chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(2, temperature_2);
