@@ -18,8 +18,6 @@ public:
 		return sAppTask;
 	};
 
-	static void SensorMeasureHandler();
-
 	CHIP_ERROR StartApp();
 
 private:

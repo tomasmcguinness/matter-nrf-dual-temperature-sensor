@@ -19,7 +19,6 @@
 
 #pragma once
 
-void MatterIdentifyPluginServerInitCallback();
 void MatterDescriptorPluginServerInitCallback();
 void MatterAccessControlPluginServerInitCallback();
 void MatterBasicInformationPluginServerInitCallback();
@@ -30,18 +29,15 @@ void MatterGeneralDiagnosticsPluginServerInitCallback();
 void MatterAdministratorCommissioningPluginServerInitCallback();
 void MatterOperationalCredentialsPluginServerInitCallback();
 void MatterGroupKeyManagementPluginServerInitCallback();
-void MatterTemperatureMeasurementPluginServerInitCallback();
 
-#define MATTER_PLUGINS_INIT                                                    \
-  MatterIdentifyPluginServerInitCallback();                                    \
-  MatterDescriptorPluginServerInitCallback();                                  \
-  MatterAccessControlPluginServerInitCallback();                               \
-  MatterBasicInformationPluginServerInitCallback();                            \
-  MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();                  \
-  MatterGeneralCommissioningPluginServerInitCallback();                        \
-  MatterNetworkCommissioningPluginServerInitCallback();                        \
-  MatterGeneralDiagnosticsPluginServerInitCallback();                          \
-  MatterAdministratorCommissioningPluginServerInitCallback();                  \
-  MatterOperationalCredentialsPluginServerInitCallback();                      \
-  MatterGroupKeyManagementPluginServerInitCallback();                          \
-  MatterTemperatureMeasurementPluginServerInitCallback();
+#define MATTER_PLUGINS_INIT                                                                                            \
+	MatterDescriptorPluginServerInitCallback();                                                                    \
+	MatterAccessControlPluginServerInitCallback();                                                                 \
+	MatterBasicInformationPluginServerInitCallback();                                                              \
+	MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();                                                    \
+	MatterGeneralCommissioningPluginServerInitCallback();                                                          \
+	MatterNetworkCommissioningPluginServerInitCallback();                                                          \
+	MatterGeneralDiagnosticsPluginServerInitCallback();                                                            \
+	MatterAdministratorCommissioningPluginServerInitCallback();                                                    \
+	MatterOperationalCredentialsPluginServerInitCallback();                                                        \
+	MatterGroupKeyManagementPluginServerInitCallback();
