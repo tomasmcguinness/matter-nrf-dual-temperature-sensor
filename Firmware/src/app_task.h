@@ -19,6 +19,7 @@ public:
 	};
 
 	CHIP_ERROR StartApp();
+	static void SensorMeasureHandler();
 
 private:
 	CHIP_ERROR Init();
