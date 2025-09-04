@@ -20,9 +20,9 @@ then run
 To compile the application for the nRF52840dk
 
 ```
-west build -b nrf52840dk/nrf52840 -d nrf52840dk -- -DCONF_FILE=prj_release.conf
+west build -b nrf54l15dk/nrf54l15/cpuapp --pristine -- -DFILE_SUFFIX=release
 ```
 
 ```
-west flash -d nrf52840dk
+west flash
 ```

@@ -28,7 +28,7 @@
 
 // TODO: re-enable HWFC once it's fixed
 &uart20 {
-	/delete-property/ hw-flow-control;
+	status = "disabled";
 };
 
 &mx25r64 {

@@ -36,18 +36,17 @@ CHIP_ERROR AppTask::Init()
 	/* Initialize Matter stack */
 	ReturnErrorOnFailure(Nrf::Matter::PrepareServer());
 
-	if (!Nrf::GetBoard().Init()) {
-		LOG_ERR("User interface initialization failed.");
-		return CHIP_ERROR_INCORRECT_STATE;
-	}
+	//if (!Nrf::GetBoard().Init()) {
+	//	LOG_ERR("User interface initialization failed.");
+	//	return CHIP_ERROR_INCORRECT_STATE;
+	//}
 
-	/* Register Matter event handler that controls the connectivity status LED based on the captured Matter network
-	 * state. */
-	ReturnErrorOnFailure(Nrf::Matter::RegisterEventHandler(Nrf::Board::DefaultMatterEventHandler, 0));
+	/* Register Matter event handler that controls the connectivity status LED based on the captured Matter network state. */
+	//ReturnErrorOnFailure(Nrf::Matter::RegisterEventHandler(Nrf::Board::DefaultMatterEventHandler, 0));
 
  	k_timer_init(&sSensorTimer, &SensorTimerHandler, nullptr);
     k_timer_user_data_set(&sSensorTimer, this);
-	k_timer_start(&sSensorTimer, K_MSEC(5000), K_MSEC(5000));
+	k_timer_start(&sSensorTimer, K_MSEC(30000), K_MSEC(30000));
 
 	return Nrf::Matter::StartServer();
 }
