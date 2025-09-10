@@ -21,6 +21,8 @@
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/adc.h>
+#include <zephyr/drivers/gpio.h>
+#include <math.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
@@ -34,11 +36,24 @@ k_timer sSensorTimer;
 #error "No suitable devicetree overlay specified"
 #endif
 
+// TODO Move this to configuration, so they can be easily changed.
+//
+#define THERMISTORNOMINAL 10000
+#define TEMPERATURENOMINAL 25
+#define BCOEFFICIENT 3977
+#define SERIESRESISTOR 10000
+
 #define DT_SPEC_AND_COMMA(node_id, prop, idx) ADC_DT_SPEC_GET_BY_IDX(node_id, idx),
 
 static const struct adc_dt_spec adc_channels[] = {
 	DT_FOREACH_PROP_ELEM(DT_PATH(zephyr_user), io_channels, DT_SPEC_AND_COMMA)
 };
+
+#define PROBE_1_DIVIDER_POWER_NODE DT_NODELABEL(probe_1_divider_power)
+#define PROBE_2_DIVIDER_POWER_NODE DT_NODELABEL(probe_2_divider_power)
+
+static const struct gpio_dt_spec probe_1_divider_power = GPIO_DT_SPEC_GET(PROBE_1_DIVIDER_POWER_NODE, gpios);
+static const struct gpio_dt_spec probe_2_divider_power = GPIO_DT_SPEC_GET(PROBE_2_DIVIDER_POWER_NODE, gpios);
 
 void SensorTimerHandler(k_timer *timer)
 {
@@ -47,7 +62,6 @@ void SensorTimerHandler(k_timer *timer)
 
 CHIP_ERROR AppTask::Init()
 {
-	/* Initialize Matter stack */
 	ReturnErrorOnFailure(Nrf::Matter::PrepareServer());
 
 	if (!Nrf::GetBoard().Init()) {
@@ -55,7 +69,6 @@ CHIP_ERROR AppTask::Init()
 		return CHIP_ERROR_INCORRECT_STATE;
 	}
 
-	/* Register Matter event handler that controls the connectivity status LED based on the captured Matter network state. */
 	ReturnErrorOnFailure(Nrf::Matter::RegisterEventHandler(Nrf::Board::DefaultMatterEventHandler, 0));
 
  	k_timer_init(&sSensorTimer, &SensorTimerHandler, nullptr);
@@ -76,8 +89,83 @@ CHIP_ERROR AppTask::StartApp()
 	return CHIP_NO_ERROR;
 }
 
+int16_t temperature_buf;
+
+struct adc_sequence temperature_sequence = {
+	.buffer = &temperature_buf,
+	.buffer_size = sizeof(temperature_buf),
+	.calibrate = true,
+};
+
+float mv_per_lsb = 3000.0F / 4096.0F;	
+
+uint16_t read_probe_temperature(int probe_number)
+{
+	int channel = probe_number - 1;
+	int err = adc_sequence_init_dt(&adc_channels[channel], &temperature_sequence);
+
+	if (err < 0)
+	{
+		LOG_ERR("Could initialise ADC%d (%d)", channel, err);
+		return -1;
+	}
+
+	err = adc_read(adc_channels[channel].dev, &temperature_sequence);
+
+	if (err < 0)
+	{
+		LOG_ERR("Could not read ADC%d (%d)", channel, err);
+		return -1;
+	}
+
+	int32_t adc_reading = temperature_buf;
+
+	int32_t val_mv = (float)adc_reading * mv_per_lsb;
+
+	float reading = (val_mv * SERIESRESISTOR) / (CONFIG_REFERENCE_VOLTAGE - val_mv);
+
+	double steinhart;
+	steinhart = reading / THERMISTORNOMINAL;		  // (R/Ro)
+	steinhart = log(steinhart);						  // ln(R/Ro)
+	steinhart /= BCOEFFICIENT;						  // 1/B * ln(R/Ro)
+	steinhart += 1.0 / (TEMPERATURENOMINAL + 273.15); // + (1/To)
+	steinhart = 1.0 / steinhart;					  // Invert
+	steinhart -= 273.15;							  // Convert to Celcius
+
+	uint16_t value = (uint16_t)(steinhart);
+
+	LOG_INF("ADC CHANNEL %d", channel);
+	LOG_INF("A: %d", adc_reading);
+	LOG_INF("V: %d", val_mv);
+	LOG_INF("R: %d", (int)reading);
+	LOG_INF("T: %d", value);
+
+	return value;
+}
+
 void AppTask::SensorMeasureHandler()
 {
-    chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, int16_t(rand() % 5000));
-    chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(2, int16_t(rand() % 5000));
+	// Switch on the power pins.
+	//
+	gpio_pin_set_dt(&probe_1_divider_power, 1);
+	gpio_pin_set_dt(&probe_2_divider_power, 1);
+
+	// Let the voltage stabalise.
+	//
+	k_sleep(K_MSEC(100));
+
+	// Read the temperatures.
+	//
+	uint16_t probe_1_temperature = read_probe_temperature(1);
+	uint16_t probe_2_temperature = read_probe_temperature(2);
+
+	// Switch off the power pins.
+	//
+	gpio_pin_set_dt(&probe_1_divider_power, 0);
+	gpio_pin_set_dt(&probe_2_divider_power, 0);
+
+	// Store the values in the attributes.
+	//
+    chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, probe_1_temperature);
+    chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(2, probe_2_temperature);
 }
