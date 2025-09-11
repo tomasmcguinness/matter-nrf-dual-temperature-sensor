@@ -22,8 +22,3 @@ source "${ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR}/config/nrfconnect/chip-module/Kconf
 source "${ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR}/config/nrfconnect/chip-module/Kconfig.defaults"
 source "${ZEPHYR_NRF_MODULE_DIR}/samples/matter/common/src/Kconfig"
 source "Kconfig.zephyr"
-
-config REFERENCE_VOLTAGE
-	int "The reference voltage"
-	range 3000 5000
-	default 3300

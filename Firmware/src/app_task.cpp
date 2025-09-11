@@ -93,6 +93,9 @@ CHIP_ERROR AppTask::StartApp()
 	return CHIP_NO_ERROR;
 }
 
+uint16_t probe_1_ref_internal;
+uint16_t probe_2_ref_internal;
+
 void AppTask::ConfigureGPIO() 
 {
 	int err;
@@ -151,8 +154,6 @@ struct adc_sequence temperature_sequence = {
 	.calibrate = true,
 };
 
-float mv_per_lsb = 3000.0F / 4096.0F;	
-
 uint16_t read_probe_temperature(int probe_number)
 {
 	int channel = probe_number - 1;
@@ -174,9 +175,17 @@ uint16_t read_probe_temperature(int probe_number)
 
 	int32_t adc_reading = temperature_buf;
 
+	uint16_t ref_internal = adc_ref_internal(adc_channels[channel].dev);
+
+	LOG_INF("ref_internal %d", ref_internal);
+	
+	float mv_per_lsb = ref_internal / 4096.0F;	
+
+	LOG_INF("mv_per_lsb %d", (int)mv_per_lsb);
+
 	int32_t val_mv = (float)adc_reading * mv_per_lsb;
 
-	float reading = (val_mv * SERIESRESISTOR) / (CONFIG_REFERENCE_VOLTAGE - val_mv);
+	float reading = (val_mv * SERIESRESISTOR) / (ref_internal - val_mv);
 
 	double steinhart;
 	steinhart = reading / THERMISTORNOMINAL;		  // (R/Ro)
@@ -206,7 +215,7 @@ void AppTask::SensorMeasureHandler()
 
 	// Let the voltage stabalise.
 	//
-	k_sleep(K_MSEC(100));
+	k_sleep(K_MSEC(1000));
 
 	// Read the temperatures.
 	//
