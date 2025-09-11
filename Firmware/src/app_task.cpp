@@ -71,9 +71,11 @@ CHIP_ERROR AppTask::Init()
 
 	ReturnErrorOnFailure(Nrf::Matter::RegisterEventHandler(Nrf::Board::DefaultMatterEventHandler, 0));
 
+	// This should only start on successfully connection to the network.
+	//
  	k_timer_init(&sSensorTimer, &SensorTimerHandler, nullptr);
     k_timer_user_data_set(&sSensorTimer, this);
-	k_timer_start(&sSensorTimer, K_MSEC(30000), K_MSEC(30000));
+	k_timer_start(&sSensorTimer, K_MSEC(5000), K_MSEC(30000));
 
 	return Nrf::Matter::StartServer();
 }

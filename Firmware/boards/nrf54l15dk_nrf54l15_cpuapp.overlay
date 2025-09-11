@@ -17,11 +17,11 @@
 	power {
 		compatible = "gpio-keys";
 		probe_1_divider_power: probe_1_divider_power {
-			gpios = <&gpio1 14 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>;
+			gpios = <&gpio1 10 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>;
 			label = "Probe 1 Divider Power";
 		};
 		probe_2_divider_power: probe_2_divider_power {
-			gpios = <&gpio1 15 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>;
+			gpios = <&gpio1 11 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>;
 			label = "Probe 2 Divider Power";
 		};
 	};
