@@ -71,11 +71,13 @@ CHIP_ERROR AppTask::Init()
 
 	ReturnErrorOnFailure(Nrf::Matter::RegisterEventHandler(Nrf::Board::DefaultMatterEventHandler, 0));
 
+	ConfigureGPIO();
+
 	// This should only start on successfully connection to the network.
 	//
  	k_timer_init(&sSensorTimer, &SensorTimerHandler, nullptr);
     k_timer_user_data_set(&sSensorTimer, this);
-	k_timer_start(&sSensorTimer, K_MSEC(5000), K_MSEC(30000));
+	k_timer_start(&sSensorTimer, K_MSEC(2000), K_MSEC(2000));
 
 	return Nrf::Matter::StartServer();
 }
@@ -89,6 +91,56 @@ CHIP_ERROR AppTask::StartApp()
 	}
 
 	return CHIP_NO_ERROR;
+}
+
+void AppTask::ConfigureGPIO() 
+{
+	int err;
+
+	if (!gpio_is_ready_dt(&probe_1_divider_power))
+	{
+		LOG_ERR("Cannot configure Divider Power switch (err: %d)", err);
+		return;
+	}
+
+	err = gpio_pin_configure_dt(&probe_1_divider_power, GPIO_OUTPUT_INACTIVE);
+	if (err != 0)
+	{
+		LOG_ERR("Configuring Divider Power pin failed (err: %d)", err);
+		return;
+	}
+
+	if (!gpio_is_ready_dt(&probe_2_divider_power))
+	{
+		LOG_ERR("Cannot configure Divider Power switch (err: %d)", err);
+		return;
+	}
+
+	err = gpio_pin_configure_dt(&probe_2_divider_power, GPIO_OUTPUT_INACTIVE);
+	if (err != 0)
+	{
+		LOG_ERR("Configuring Divider Power pin failed (err: %d)", err);
+		return;
+	}
+
+	for (size_t i = 0U; i < ARRAY_SIZE(adc_channels); i++)
+	{
+		if (!device_is_ready(adc_channels[i].dev))
+		{
+			LOG_ERR("ADC controller device not ready");
+			return;
+		}
+
+		err = adc_channel_setup_dt(&adc_channels[i]);
+
+		if (err < 0)
+		{
+			LOG_ERR("Could not setup channel #%d (%d)", i, err);
+			return;
+		}
+
+		LOG_INF("Setup channel #%d (%d)", i, err);
+	}
 }
 
 int16_t temperature_buf;

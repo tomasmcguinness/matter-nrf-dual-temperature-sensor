@@ -23,4 +23,5 @@ public:
 
 private:
 	CHIP_ERROR Init();
+	void ConfigureGPIO();
 };
