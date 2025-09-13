@@ -9,10 +9,10 @@
 		nordic,pm-ext-flash = &mx25r64;
 	};
 
-	aliases {
-		// Use watchdog wdt31 as the application watchdog
-		watchdog0 = &wdt31;
-	};
+	// aliases {
+	// 	// Use watchdog wdt31 as the application watchdog
+	// 	watchdog0 = &wdt31;
+	// };
 
 	power {
 		compatible = "gpio-keys";
@@ -27,7 +27,8 @@
 	};
 
 	zephyr,user {
-		io-channels = <&adc 0>, <&adc 1>;
+		//io-channels = <&adc 0>, <&adc 1>;
+		io-channels = <&adc 0>;
 	};
 };
 
@@ -43,18 +44,18 @@
 		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
 		zephyr,input-positive = <NRF_SAADC_AIN0>;
 		zephyr,resolution = <12>;
-		zephyr,oversampling = <8>;
+//		zephyr,oversampling = <8>;
 	};
 
-	channel@1 {
-		reg = <1>;
-		zephyr,gain = "ADC_GAIN_1_2";
-		zephyr,reference = "ADC_REF_INTERNAL";
-		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
-		zephyr,input-positive = <NRF_SAADC_AIN1>;
-		zephyr,resolution = <12>;
-		zephyr,oversampling = <8>;
-	};
+	// channel@1 {
+	// 	reg = <1>;
+	// 	zephyr,gain = "ADC_GAIN_1_2";
+	// 	zephyr,reference = "ADC_REF_INTERNAL";
+	// 	zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+	// 	zephyr,input-positive = <NRF_SAADC_AIN1>;
+	// 	zephyr,resolution = <12>;
+	// 	//zephyr,oversampling = <8>;
+	// };
 };
 
 // restore full RRAM and SRAM space - by default some parts are dedicated to FLRP
@@ -68,14 +69,14 @@
 };
 
 // TODO: re-enable HWFC once it's fixed
-&uart20 {
-	status = "disabled";
-};
+// &uart20 {
+// 	status = "disabled";
+// };
 
-&mx25r64 {
-	status = "okay";
-};
+// &mx25r64 {
+// 	status = "okay";
+// };
 
-&wdt31 {
-	status = "okay";
-};
+// &wdt31 {
+// 	status = "okay";
+// };

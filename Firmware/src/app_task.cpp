@@ -24,6 +24,8 @@
 #include <zephyr/drivers/gpio.h>
 #include <math.h>
 
+#include <zephyr/sys/printk.h>
+
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip;
@@ -130,6 +132,8 @@ void AppTask::ConfigureGPIO()
 	{
 		if (!device_is_ready(adc_channels[i].dev))
 		{
+			printk("ADC controller device %s not ready\n", adc_channels[i].dev->name);
+
 			LOG_ERR("ADC controller device not ready");
 			return;
 		}
@@ -138,69 +142,81 @@ void AppTask::ConfigureGPIO()
 
 		if (err < 0)
 		{
+			printk("Could not setup channel #%d (%d)\n", i, err);
+
 			LOG_ERR("Could not setup channel #%d (%d)", i, err);
 			return;
 		}
 
-		LOG_INF("Setup channel #%d (%d)", i, err);
+		LOG_INF("Successfully setup ADC channel #%d", i);
 	}
 }
 
-int16_t temperature_buf;
+uint16_t adc_sequence_buf;
 
-struct adc_sequence temperature_sequence = {
-	.buffer = &temperature_buf,
-	.buffer_size = sizeof(temperature_buf),
-	.calibrate = true,
+struct adc_sequence adc_sequence = {
+	.buffer = &adc_sequence_buf,
+	.buffer_size = sizeof(adc_sequence_buf),
+	//.calibrate = true,
 };
 
-uint16_t read_probe_temperature(int probe_number)
+int16_t read_probe_temperature(int probe_number)
 {
 	int channel = probe_number - 1;
-	int err = adc_sequence_init_dt(&adc_channels[channel], &temperature_sequence);
+
+	adc_dt_spec adc_channel = adc_channels[channel];
+
+	int err = adc_sequence_init_dt(&adc_channel, &adc_sequence);
 
 	if (err < 0)
 	{
-		LOG_ERR("Could initialise ADC%d (%d)", channel, err);
+		LOG_INF("Could initialise ADC%d (%d)", channel, err);
 		return -1;
 	}
 
-	err = adc_read(adc_channels[channel].dev, &temperature_sequence);
+	err = adc_read_dt(&adc_channel, &adc_sequence);
 
 	if (err < 0)
 	{
-		LOG_ERR("Could not read ADC%d (%d)", channel, err);
+		LOG_INF("Could not read ADC%d (%d)", channel, err);
 		return -1;
 	}
 
-	int32_t adc_reading = temperature_buf;
+	int32_t val_mv = (int32_t)adc_sequence_buf;
 
-	uint16_t ref_internal = adc_ref_internal(adc_channels[channel].dev);
+	err = adc_raw_to_millivolts_dt(&adc_channel, &val_mv);
 
-	LOG_INF("ref_internal %d", ref_internal);
-	
-	float mv_per_lsb = ref_internal / 4096.0F;	
+	if (err < 0) {
+	    LOG_ERR(" (value in mV not available)\n");
+		return -1;
+	} 
 
-	LOG_INF("mv_per_lsb %d", (int)mv_per_lsb);
+	uint16_t ref_internal = adc_ref_internal(adc_channel.dev);
 
-	int32_t val_mv = (float)adc_reading * mv_per_lsb;
+	//float mv_per_lsb = ref_internal / 4096.0F;	
 
-	float reading = (val_mv * SERIESRESISTOR) / (ref_internal - val_mv);
+	//LOG_INF("mv_per_lsb %d", (int)mv_per_lsb);
+	//LOG_INF("mv_per_lsb %d", val_mv);
+
+	//int32_t val_mv = (float)adc_reading * mv_per_lsb;
+
+	float resistance = (val_mv * SERIESRESISTOR) / (1800 - val_mv);
 
 	double steinhart;
-	steinhart = reading / THERMISTORNOMINAL;		  // (R/Ro)
+	steinhart = resistance / THERMISTORNOMINAL;		  // (R/Ro)
 	steinhart = log(steinhart);						  // ln(R/Ro)
 	steinhart /= BCOEFFICIENT;						  // 1/B * ln(R/Ro)
 	steinhart += 1.0 / (TEMPERATURENOMINAL + 273.15); // + (1/To)
 	steinhart = 1.0 / steinhart;					  // Invert
 	steinhart -= 273.15;							  // Convert to Celcius
 
-	uint16_t value = (uint16_t)(steinhart);
+	int16_t value = (int16_t)(steinhart);
 
 	LOG_INF("ADC CHANNEL %d", channel);
-	LOG_INF("A: %d", adc_reading);
-	LOG_INF("V: %d", val_mv);
-	LOG_INF("R: %d", (int)reading);
+	LOG_INF("Reference %d mV", ref_internal);
+	//LOG_INF("A: %d", adc_sequence);
+	LOG_INF("V: %"PRId32" mV", val_mv);
+	LOG_INF("R: %d", (int)resistance);
 	LOG_INF("T: %d", value);
 
 	return value;
@@ -219,8 +235,8 @@ void AppTask::SensorMeasureHandler()
 
 	// Read the temperatures.
 	//
-	uint16_t probe_1_temperature = read_probe_temperature(1);
-	uint16_t probe_2_temperature = read_probe_temperature(2);
+	int16_t probe_1_temperature = read_probe_temperature(1);
+	//int16_t probe_2_temperature = read_probe_temperature(2);
 
 	// Switch off the power pins.
 	//
@@ -230,5 +246,5 @@ void AppTask::SensorMeasureHandler()
 	// Store the values in the attributes.
 	//
     chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, probe_1_temperature);
-    chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(2, probe_2_temperature);
+    //chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(2, probe_2_temperature);
 }
