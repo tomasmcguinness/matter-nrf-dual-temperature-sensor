@@ -1,0 +1,99 @@
+/*
+ * Copyright (c) 2024 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: LicenseRef-Nordic-5-Clause
+ */
+
+/ {
+	chosen {
+		nordic,pm-ext-flash = &mx25r64;
+	};
+
+	aliases {
+	 	// Use watchdog wdt31 as the application watchdog
+	 	watchdog0 = &wdt31;
+	};
+
+	// power {
+	// 	compatible = "gpio-keys";
+	// 	probe_1_divider_power: probe_1_divider_power {
+	// 		gpios = <&gpio1 10 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>;
+	// 		label = "Probe 1 Divider Power";
+	// 	};
+	// 	probe_2_divider_power: probe_2_divider_power {
+	// 		gpios = <&gpio1 11 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>;
+	// 		label = "Probe 2 Divider Power";
+	// 	};
+	// };
+
+	zephyr,user {
+		//io-channels = <&adc 0>, <&adc 1>;
+		io-channels = <&adc 0>;
+	};
+};
+
+&adc {
+	#address-cells = <1>;
+	#size-cells = <0>;
+    status = "okay";
+
+	channel@0 {
+		reg = <0>;
+		zephyr,gain = "ADC_GAIN_1_2";
+		zephyr,reference = "ADC_REF_INTERNAL";
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,input-positive = <NRF_SAADC_AIN5>;
+		zephyr,resolution = <12>;
+		zephyr,oversampling = <8>;
+	};
+
+	// channel@1 {
+	// 	reg = <1>;
+	// 	zephyr,gain = "ADC_GAIN_1_2";
+	// 	zephyr,reference = "ADC_REF_INTERNAL";
+	// 	zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+	// 	zephyr,input-positive = <NRF_SAADC_AIN1>;
+	// 	zephyr,resolution = <12>;
+	// 	//zephyr,oversampling = <8>;
+	// };
+};
+
+// restore full RRAM and SRAM space - by default some parts are dedicated to FLRP
+&cpuapp_rram {
+	reg = <0x0 DT_SIZE_K(1524)>;
+};
+
+&cpuapp_sram {
+	reg = <0x20000000 DT_SIZE_K(256)>;
+	ranges = <0x0 0x20000000  0x40000>;
+};
+
+// TODO: re-enable HWFC once it's fixed
+&uart20 {
+	/delete-property/ hw-flow-control;
+};
+
+// &uart00 {
+// 	status = "disabled";
+// };
+
+// &uart20 {
+// 	status = "disabled";
+// };
+
+// &uart30 {
+// 	status = "disabled";
+// };
+
+// TODO: re-enable HWFC once it's fixed
+// &uart20 {
+// 	status = "disabled";
+// };
+
+&mx25r64 {
+	status = "okay";
+};
+
+&wdt31 {
+	status = "okay";
+};
