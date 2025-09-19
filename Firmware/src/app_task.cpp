@@ -77,7 +77,7 @@ CHIP_ERROR AppTask::Init()
 	//
  	k_timer_init(&sSensorTimer, &SensorTimerHandler, nullptr);
     k_timer_user_data_set(&sSensorTimer, this);
-	k_timer_start(&sSensorTimer, K_MSEC(2000), K_MSEC(2000));
+	k_timer_start(&sSensorTimer, K_MSEC(5000), K_MSEC(5000));
 
 	return Nrf::Matter::StartServer();
 }
@@ -207,29 +207,17 @@ int16_t read_probe_temperature(int probe_number)
 void AppTask::SensorMeasureHandler()
 {
 	// Switch on the power pins.
-	
-	//gpio_pin_set_dt(&probe_1_divider_power, 1);
-	//gpio_pin_set_dt(&probe_2_divider_power, 1);
-
-	// Let the voltage stabalise.
-	
+	//
+	gpio_pin_set_dt(&probe_1_divider_power, 1);
 	k_sleep(K_MSEC(1000));
-
-	// Read the temperatures.
-	
 	int16_t probe_1_temperature = read_probe_temperature(1) * 100;
+	gpio_pin_set_dt(&probe_1_divider_power, 0);
+
+	gpio_pin_set_dt(&probe_2_divider_power, 1);
+	k_sleep(K_MSEC(1000));
 	int16_t probe_2_temperature = read_probe_temperature(2) * 100;
+	gpio_pin_set_dt(&probe_2_divider_power, 0);
 
-	// Switch off the power pins.
-	
-	// gpio_pin_set_dt(&probe_1_divider_power, 0);
-	// gpio_pin_set_dt(&probe_2_divider_power, 0);
-
-	// Store the values in the attributes.
-	
     chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, probe_1_temperature);
     chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(2, probe_2_temperature);
-    
-	//chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, 10000);
-    //chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(2, 10000);
 }
