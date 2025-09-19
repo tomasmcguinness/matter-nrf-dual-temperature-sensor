@@ -8,7 +8,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-//struct k_timer;
+struct k_timer;
 
 class AppTask {
 public:
@@ -19,9 +19,9 @@ public:
 	};
 
 	CHIP_ERROR StartApp();
-	//static void SensorMeasureHandler();
+	static void SensorMeasureHandler();
 
 private:
 	CHIP_ERROR Init();
-	//void ConfigureGPIO();
+	void ConfigureGPIO();
 };
