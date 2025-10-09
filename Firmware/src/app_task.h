@@ -8,7 +8,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-struct k_timer;
+using namespace ::chip::DeviceLayer;
 
 class AppTask {
 public:
@@ -23,5 +23,6 @@ public:
 
 private:
 	CHIP_ERROR Init();
+	static void MatterEventHandler(const ChipDeviceEvent *event, intptr_t data);
 	void ConfigureGPIO();
 };

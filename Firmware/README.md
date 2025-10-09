@@ -17,11 +17,13 @@ then run
 
 ## Compiling
 
-To compile the application for the nRF52840dk
+To compile the application for the nRF54L15
 
 ```
 west build -b nrf54l15dk/nrf54l15/cpuapp --pristine -- -DFILE_SUFFIX=release
 ```
+
+and to flash it to the board, run
 
 ```
 west flash

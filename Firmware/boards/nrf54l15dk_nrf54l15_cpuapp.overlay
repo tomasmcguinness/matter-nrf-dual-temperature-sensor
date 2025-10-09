@@ -26,8 +26,29 @@
 		};
 	};
 
+	leds {
+        compatible = "gpio-leds";
+        led0: led_0 {
+            gpios = <&gpio1 13 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>;
+			label = "Indicator LED";
+        };
+    };
+
+	buttons {
+        compatible = "gpio-keys";
+        button0: button_0 {
+            gpios = <&gpio1 14 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>;
+			label = "Reset Button";
+        };
+     };
+
 	zephyr,user {
 		io-channels = <&adc 0>, <&adc 1>;
+	};
+
+	aliases {
+		indicator-led = &led0;
+		reset-button = &button0;
 	};
 };
 
@@ -71,23 +92,6 @@
 &uart20 {
 	/delete-property/ hw-flow-control;
 };
-
-// &uart00 {
-// 	status = "disabled";
-// };
-
-// &uart20 {
-// 	status = "disabled";
-// };
-
-// &uart30 {
-// 	status = "disabled";
-// };
-
-// TODO: re-enable HWFC once it's fixed
-// &uart20 {
-// 	status = "disabled";
-// };
 
 &mx25r64 {
 	status = "okay";
