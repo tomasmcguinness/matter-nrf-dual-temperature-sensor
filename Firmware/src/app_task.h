@@ -19,10 +19,17 @@ public:
 	};
 
 	CHIP_ERROR StartApp();
-	static void SensorMeasureHandler();
-
+	
 private:
 	CHIP_ERROR Init();
+
 	static void MatterEventHandler(const ChipDeviceEvent *event, intptr_t data);
+	static void SensorMeasureHandler();
+	static void SensorTimerCallback(k_timer *timer);
+	static void IndicatorTimerCallback(k_timer *timer);
+	static void FactoryResetTimerCallback(k_timer *timer);
+
+	static void ResetButtonCallback(const struct device *dev, struct gpio_callback *cb, uint32_t pins);
+
 	void ConfigureGPIO();
 };

@@ -32,6 +32,7 @@ using namespace ::chip::DeviceLayer;
 
 k_timer sIndicatorTimer;
 k_timer sSensorTimer;
+k_timer sFactoryResetTimer;
 bool mIndicatorState;
 
 #if !DT_NODE_EXISTS(DT_PATH(zephyr_user)) || !DT_NODE_HAS_PROP(DT_PATH(zephyr_user), io_channels)
@@ -64,19 +65,25 @@ static const struct gpio_dt_spec reset_button = GPIO_DT_SPEC_GET(RESET_BUTTON_NO
 
 static struct gpio_callback reset_button_cb_data;
 
-void SensorTimerCallback(k_timer *timer)
+void AppTask::SensorTimerCallback(k_timer *timer)
 {
 	Nrf::PostTask([]
 				  { AppTask::SensorMeasureHandler(); });
 }
 
-void IndicatorTimerCallback(k_timer *timer)
+void AppTask::IndicatorTimerCallback(k_timer *timer)
 {
 	LOG_INF("LED Indicator: %d", mIndicatorState);
 
 	mIndicatorState = !mIndicatorState;
 
 	gpio_pin_set_dt(&indicator_led, mIndicatorState);
+}
+
+void AppTask::FactoryResetTimerCallback(k_timer *timer)
+{
+	LOG_INF("Factory Reset Triggered");
+	chip::Server::GetInstance().ScheduleFactoryReset();
 }
 
 void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t data)
@@ -134,6 +141,8 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t data)
 
 CHIP_ERROR AppTask::Init()
 {
+	LOG_INF("Init()");
+
 	ReturnErrorOnFailure(Nrf::Matter::PrepareServer());
 
 	k_timer_init(&sIndicatorTimer, &IndicatorTimerCallback, nullptr);
@@ -145,6 +154,9 @@ CHIP_ERROR AppTask::Init()
 
 	k_timer_init(&sSensorTimer, &SensorTimerCallback, nullptr);
 	k_timer_user_data_set(&sSensorTimer, this);
+
+	k_timer_init(&sFactoryResetTimer, &FactoryResetTimerCallback, nullptr);
+	k_timer_user_data_set(&sFactoryResetTimer, this);
 
 	return Nrf::Matter::StartServer();
 }
@@ -161,12 +173,19 @@ CHIP_ERROR AppTask::StartApp()
 	return CHIP_NO_ERROR;
 }
 
-void pin_isr(const struct device *dev, struct gpio_callback *cb, uint32_t pins)
+void AppTask::ResetButtonCallback(const struct device *dev, struct gpio_callback *cb, uint32_t pins)
 {
 	LOG_INF("Reset Button Clicked");
-	gpio_pin_toggle_dt(&indicator_led);
 
-	chip::Server::GetInstance().ScheduleFactoryReset();
+	// Check if the button is pressed.
+	//
+	if (gpio_pin_get_dt(&reset_button) == 0)
+	{
+		k_timer_start(&sFactoryResetTimer, K_SECONDS(10), K_NO_WAIT);
+	}
+	else {
+		k_timer_stop(&sFactoryResetTimer);
+	}
 }
 
 void AppTask::ConfigureGPIO()
@@ -235,7 +254,7 @@ void AppTask::ConfigureGPIO()
 
 	if (!gpio_is_ready_dt(&reset_button))
 	{
-		LOG_ERR("Cannot configure reset button");
+		LOG_ERR("Reset button is not ready");
 		return;
 	}
 
@@ -243,7 +262,7 @@ void AppTask::ConfigureGPIO()
 
 	gpio_pin_interrupt_configure_dt(&reset_button, GPIO_INT_EDGE_BOTH);
 
-	gpio_init_callback(&reset_button_cb_data, pin_isr, BIT(reset_button.pin));
+	gpio_init_callback(&reset_button_cb_data, AppTask::ResetButtonCallback, BIT(reset_button.pin));
 
 	gpio_add_callback(reset_button.port, &reset_button_cb_data);
 
