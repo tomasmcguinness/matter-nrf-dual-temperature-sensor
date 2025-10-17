@@ -145,6 +145,8 @@ CHIP_ERROR AppTask::Init()
 
 	ReturnErrorOnFailure(Nrf::Matter::PrepareServer());
 
+	//chip::app::Clusters::FixedLabel::Attributes::LabelList::Set(1, probe_1_temperature);
+
 	k_timer_init(&sIndicatorTimer, &IndicatorTimerCallback, nullptr);
 	k_timer_user_data_set(&sIndicatorTimer, this);
 
