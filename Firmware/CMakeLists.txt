@@ -32,7 +32,6 @@ target_include_directories(app PRIVATE
 target_sources(app PRIVATE
     src/app_task.cpp
     src/main.cpp
-    src/zcl_callbacks.cpp
 )
 
 ncs_configure_data_model()
