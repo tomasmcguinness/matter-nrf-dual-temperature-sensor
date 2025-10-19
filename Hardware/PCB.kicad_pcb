@@ -8,9 +8,10 @@
 	)
 	(paper "A4")
 	(title_block
-		(title "XIAO nRF52840 Dual Sensor")
-		(rev "4")
+		(title "Matter nRF54L15 Dual Temperature Sensor")
+		(rev "1")
 		(company "Cold Bear Ltd")
+		(comment 4 "AISLER Project ID: CJCXXZRD")
 	)
 	(layers
 		(0 "F.Cu" signal)
@@ -3036,7 +3037,7 @@
 		(at 57.3625 71.15)
 		(descr "Resistor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
 		(tags "resistor")
-		(property "Reference" "R4"
+		(property "Reference" "R3"
 			(at 0 -1.65 0)
 			(layer "F.SilkS")
 			(uuid "bcb006fc-48b9-4253-a520-eab0fd69b342")
@@ -3879,7 +3880,7 @@
 		)
 	)
 	(gr_text "CA8M6"
-		(at 51.68 75.34 270)
+		(at 64.96 75.34 0)
 		(layer "F.SilkS")
 		(uuid "6b83c4d0-8fcb-43e5-9d57-99af213f5f4d")
 		(effects
