@@ -5,9 +5,6 @@
  */
 
 / {
-	chosen {
-	 	nordic,pm-ext-flash = &mx25r64;
-	};
 
 	power {
 		compatible = "gpio-keys";
@@ -90,9 +87,9 @@
 	/delete-property/ hw-flow-control;
 };
 
-// &mx25r64 {
-// 	status = "okay";
-// };
+&mx25r64 {
+	status = "disabled";
+};
 
 &wdt31 {
 	status = "okay";
