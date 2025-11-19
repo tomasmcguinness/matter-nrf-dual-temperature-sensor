@@ -355,12 +355,12 @@ void AppTask::SensorMeasureHandler()
 	//
 	gpio_pin_set_dt(&probe_1_divider_power, 1);
 	k_sleep(K_MSEC(1000));
-	int16_t probe_1_temperature = read_probe_temperature(1) * 100;
+	int16_t probe_1_temperature = read_probe_temperature(1) * 100; // Convert temperature to Matter
 	gpio_pin_set_dt(&probe_1_divider_power, 0);
 
 	gpio_pin_set_dt(&probe_2_divider_power, 1);
 	k_sleep(K_MSEC(1000));
-	int16_t probe_2_temperature = read_probe_temperature(2) * 100;
+	int16_t probe_2_temperature = read_probe_temperature(2) * 100; // Convert temperature to Matter
 	gpio_pin_set_dt(&probe_2_divider_power, 0);
 
 	chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, probe_1_temperature);
