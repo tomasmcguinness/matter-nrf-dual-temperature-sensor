@@ -100,3 +100,7 @@
 &wdt31 {
 	status = "okay";
 };
+
+&pwm20 {
+	status = "disabled";
+};
