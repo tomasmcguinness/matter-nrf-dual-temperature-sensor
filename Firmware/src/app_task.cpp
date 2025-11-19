@@ -93,8 +93,8 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t data)
 
 	switch (event->Type)
 	{
-		case DeviceEventType::kServiceProvisioningChange:
-			LOG_INF("Provisioning changed!");
+	case DeviceEventType::kServiceProvisioningChange:
+		LOG_INF("Provisioning changed!");
 		break;
 	case DeviceEventType::kCHIPoBLEAdvertisingChange:
 		isBleConnected = ConnectivityMgr().NumBLEConnections() != 0;
@@ -120,20 +120,18 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t data)
 	else if (isBleConnected)
 	{
 		LOG_INF("Bluetooth connection opened");
-
+		k_timer_stop(&sIndicatorTimer);
 		k_timer_start(&sIndicatorTimer, K_MSEC(200), K_MSEC(200));
 	}
 	else if (ConnectivityMgr().IsBLEAdvertising())
 	{
 		LOG_INF("Bluetooth is advertising");
-
+		k_timer_stop(&sIndicatorTimer);
 		k_timer_start(&sIndicatorTimer, K_MSEC(1000), K_MSEC(1000));
 	}
 	else
 	{
 		LOG_INF("Bluetooth is disconnected");
-
-		k_timer_stop(&sSensorTimer);
 		k_timer_stop(&sIndicatorTimer);
 		k_timer_start(&sIndicatorTimer, K_MSEC(1000), K_MSEC(1000));
 	}
@@ -145,7 +143,7 @@ CHIP_ERROR AppTask::Init()
 
 	ReturnErrorOnFailure(Nrf::Matter::PrepareServer());
 
-	//chip::app::Clusters::FixedLabel::Attributes::LabelList::Set(1, probe_1_temperature);
+	// chip::app::Clusters::FixedLabel::Attributes::LabelList::Set(1, probe_1_temperature);
 
 	k_timer_init(&sIndicatorTimer, &IndicatorTimerCallback, nullptr);
 	k_timer_user_data_set(&sIndicatorTimer, this);
@@ -185,7 +183,8 @@ void AppTask::ResetButtonCallback(const struct device *dev, struct gpio_callback
 	{
 		k_timer_start(&sFactoryResetTimer, K_SECONDS(10), K_NO_WAIT);
 	}
-	else {
+	else
+	{
 		k_timer_stop(&sFactoryResetTimer);
 	}
 }
