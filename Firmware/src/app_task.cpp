@@ -17,6 +17,7 @@
 #include <zephyr/logging/log.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/identify-server/identify-server.h>
 
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
@@ -64,6 +65,22 @@ static const struct gpio_dt_spec indicator_led = GPIO_DT_SPEC_GET(INDICATOR_LED_
 static const struct gpio_dt_spec reset_button = GPIO_DT_SPEC_GET(RESET_BUTTON_NODE, gpios);
 
 static struct gpio_callback reset_button_cb_data;
+
+constexpr EndpointId kLightEndpointId = 0;
+
+Identify sIdentify = {kLightEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator};
+
+void AppTask::IdentifyStartHandler(Identify *)
+{
+	k_timer_stop(&sIndicatorTimer);
+	k_timer_start(&sIndicatorTimer, K_MSEC(500), K_MSEC(500));
+}
+
+void AppTask::IdentifyStopHandler(Identify *)
+{
+	k_timer_stop(&sIndicatorTimer);
+	gpio_pin_set_dt(&indicator_led, 0);
+}
 
 void AppTask::SensorTimerCallback(k_timer *timer)
 {
@@ -142,8 +159,6 @@ CHIP_ERROR AppTask::Init()
 	LOG_INF("Init()");
 
 	ReturnErrorOnFailure(Nrf::Matter::PrepareServer());
-
-	// chip::app::Clusters::FixedLabel::Attributes::LabelList::Set(1, probe_1_temperature);
 
 	k_timer_init(&sIndicatorTimer, &IndicatorTimerCallback, nullptr);
 	k_timer_user_data_set(&sIndicatorTimer, this);
