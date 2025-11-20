@@ -132,7 +132,7 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t data)
 
 		gpio_pin_set_dt(&indicator_led, 0);
 
-		k_timer_start(&sSensorTimer, K_MSEC(5000), K_MSEC(5000));
+		k_timer_start(&sSensorTimer, K_MSEC(30000), K_NO_WAIT);
 	}
 	else if (isBleConnected)
 	{
@@ -351,18 +351,24 @@ double read_probe_temperature(int probe_number)
 
 void AppTask::SensorMeasureHandler()
 {
-	// Switch on the power pins.
+	// Switch on the power pins. Let the power stay on for a short period of 
+	// time so the voltage stabalises.
 	//
 	gpio_pin_set_dt(&probe_1_divider_power, 1);
-	k_sleep(K_MSEC(1000));
+	k_sleep(K_MSEC(50));
 	int16_t probe_1_temperature = read_probe_temperature(1) * 100; // Convert temperature to Matter
 	gpio_pin_set_dt(&probe_1_divider_power, 0);
 
+	// Leave a small gap between each reading.
+	k_sleep(K_MSEC(50));
+
 	gpio_pin_set_dt(&probe_2_divider_power, 1);
-	k_sleep(K_MSEC(1000));
+	k_sleep(K_MSEC(50));
 	int16_t probe_2_temperature = read_probe_temperature(2) * 100; // Convert temperature to Matter
 	gpio_pin_set_dt(&probe_2_divider_power, 0);
 
+	// With both readings taken, update both of the clusters.
+	//
 	chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, probe_1_temperature);
 	chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(2, probe_2_temperature);
 }

@@ -93,10 +93,10 @@
 	status = "disabled";
 };
 
-&wdt31 {
-	status = "okay";
-};
-
 &pwm20 {
 	status = "disabled";
+};
+
+&wdt31 {
+	status = "okay";
 };
