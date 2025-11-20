@@ -17,6 +17,7 @@
 #include <zephyr/logging/log.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/identify-server/identify-server.h>
 
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
@@ -65,6 +66,22 @@ static const struct gpio_dt_spec reset_button = GPIO_DT_SPEC_GET(RESET_BUTTON_NO
 
 static struct gpio_callback reset_button_cb_data;
 
+constexpr EndpointId kLightEndpointId = 0;
+
+Identify sIdentify = {kLightEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator};
+
+void AppTask::IdentifyStartHandler(Identify *)
+{
+	k_timer_stop(&sIndicatorTimer);
+	k_timer_start(&sIndicatorTimer, K_MSEC(500), K_MSEC(500));
+}
+
+void AppTask::IdentifyStopHandler(Identify *)
+{
+	k_timer_stop(&sIndicatorTimer);
+	gpio_pin_set_dt(&indicator_led, 0);
+}
+
 void AppTask::SensorTimerCallback(k_timer *timer)
 {
 	Nrf::PostTask([]
@@ -93,8 +110,8 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t data)
 
 	switch (event->Type)
 	{
-		case DeviceEventType::kServiceProvisioningChange:
-			LOG_INF("Provisioning changed!");
+	case DeviceEventType::kServiceProvisioningChange:
+		LOG_INF("Provisioning changed!");
 		break;
 	case DeviceEventType::kCHIPoBLEAdvertisingChange:
 		isBleConnected = ConnectivityMgr().NumBLEConnections() != 0;
@@ -115,25 +132,23 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t data)
 
 		gpio_pin_set_dt(&indicator_led, 0);
 
-		k_timer_start(&sSensorTimer, K_MSEC(5000), K_MSEC(5000));
+		k_timer_start(&sSensorTimer, K_MSEC(30000), K_NO_WAIT);
 	}
 	else if (isBleConnected)
 	{
 		LOG_INF("Bluetooth connection opened");
-
+		k_timer_stop(&sIndicatorTimer);
 		k_timer_start(&sIndicatorTimer, K_MSEC(200), K_MSEC(200));
 	}
 	else if (ConnectivityMgr().IsBLEAdvertising())
 	{
 		LOG_INF("Bluetooth is advertising");
-
+		k_timer_stop(&sIndicatorTimer);
 		k_timer_start(&sIndicatorTimer, K_MSEC(1000), K_MSEC(1000));
 	}
 	else
 	{
 		LOG_INF("Bluetooth is disconnected");
-
-		k_timer_stop(&sSensorTimer);
 		k_timer_stop(&sIndicatorTimer);
 		k_timer_start(&sIndicatorTimer, K_MSEC(1000), K_MSEC(1000));
 	}
@@ -144,8 +159,6 @@ CHIP_ERROR AppTask::Init()
 	LOG_INF("Init()");
 
 	ReturnErrorOnFailure(Nrf::Matter::PrepareServer());
-
-	//chip::app::Clusters::FixedLabel::Attributes::LabelList::Set(1, probe_1_temperature);
 
 	k_timer_init(&sIndicatorTimer, &IndicatorTimerCallback, nullptr);
 	k_timer_user_data_set(&sIndicatorTimer, this);
@@ -185,7 +198,8 @@ void AppTask::ResetButtonCallback(const struct device *dev, struct gpio_callback
 	{
 		k_timer_start(&sFactoryResetTimer, K_SECONDS(10), K_NO_WAIT);
 	}
-	else {
+	else
+	{
 		k_timer_stop(&sFactoryResetTimer);
 	}
 }
@@ -337,18 +351,24 @@ double read_probe_temperature(int probe_number)
 
 void AppTask::SensorMeasureHandler()
 {
-	// Switch on the power pins.
+	// Switch on the power pins. Let the power stay on for a short period of 
+	// time so the voltage stabalises.
 	//
 	gpio_pin_set_dt(&probe_1_divider_power, 1);
-	k_sleep(K_MSEC(1000));
-	int16_t probe_1_temperature = read_probe_temperature(1) * 100;
+	k_sleep(K_MSEC(50));
+	int16_t probe_1_temperature = read_probe_temperature(1) * 100; // Convert temperature to Matter
 	gpio_pin_set_dt(&probe_1_divider_power, 0);
 
+	// Leave a small gap between each reading.
+	k_sleep(K_MSEC(50));
+
 	gpio_pin_set_dt(&probe_2_divider_power, 1);
-	k_sleep(K_MSEC(1000));
-	int16_t probe_2_temperature = read_probe_temperature(2) * 100;
+	k_sleep(K_MSEC(50));
+	int16_t probe_2_temperature = read_probe_temperature(2) * 100; // Convert temperature to Matter
 	gpio_pin_set_dt(&probe_2_divider_power, 0);
 
+	// With both readings taken, update both of the clusters.
+	//
 	chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, probe_1_temperature);
 	chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(2, probe_2_temperature);
 }

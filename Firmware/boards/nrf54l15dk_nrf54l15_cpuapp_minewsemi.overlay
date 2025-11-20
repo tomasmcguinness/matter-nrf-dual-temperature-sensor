@@ -5,6 +5,7 @@
  */
 
 / {
+
 	power {
 		compatible = "gpio-keys";
 		probe_1_divider_power: probe_1_divider_power {
@@ -20,7 +21,7 @@
 	leds {
 		compatible = "gpio-leds";
 		led0: led_0 {
-			gpios = <&gpio2 9 GPIO_ACTIVE_HIGH>;
+			gpios = <&gpio2 10 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>;
 			label = "Indicator LED";
 		};
 	};
@@ -28,7 +29,7 @@
 	buttons {
 		compatible = "gpio-keys";
 		button0: button_0 {
-			gpios = <&gpio1 13 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+			gpios = <&gpio2 8 (GPIO_PULL_DOWN | GPIO_ACTIVE_HIGH)>;
 			label = "Reset Button";
 		};
 	};
@@ -38,10 +39,6 @@
 		watchdog0 = &wdt31;
 		indicator-led = &led0;
 		reset-button = &button0;
-	};
-
-	chosen {
-	 	nordic,pm-ext-flash = &mx25r64;
 	};
 
 	zephyr,user {
@@ -85,22 +82,15 @@
 	ranges = <0x0 0x20000000  0x40000>;
 };
 
+// TODO: re-enable HWFC once it's fixed
 &uart20 {
-	status = "disabled";
-};
-
-&uart30 {
-	status = "disabled";
+	/delete-property/ hw-flow-control;
 };
 
 &mx25r64 {
-	status = "okay";
+	status = "disabled";
 };
 
 &wdt31 {
 	status = "okay";
-};
-
-&pwm20 {
-	status = "disabled";
 };

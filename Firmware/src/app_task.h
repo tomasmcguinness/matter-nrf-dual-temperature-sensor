@@ -10,7 +10,10 @@
 
 using namespace ::chip::DeviceLayer;
 
-class AppTask {
+struct Identify;
+
+class AppTask
+{
 public:
 	static AppTask &Instance()
 	{
@@ -19,7 +22,10 @@ public:
 	};
 
 	CHIP_ERROR StartApp();
-	
+
+	static void IdentifyStartHandler(Identify *);
+	static void IdentifyStopHandler(Identify *);
+
 private:
 	CHIP_ERROR Init();
 
