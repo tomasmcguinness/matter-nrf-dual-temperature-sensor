@@ -1924,7 +1924,7 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Regulator_Linear:MCP1700x-330xxTO"
+		(symbol "Regulator_Linear:MCP1700x-330xxTT"
 			(pin_names
 				(offset 0.254)
 			)
@@ -1932,15 +1932,15 @@
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "U"
-				(at -3.81 -3.175 0)
+				(at -3.81 3.175 0)
 				(effects
 					(font
 						(size 1.27 1.27)
 					)
 				)
 			)
-			(property "Value" "MCP1700x-330xxTO"
-				(at 0 -3.175 0)
+			(property "Value" "MCP1700x-330xxTT"
+				(at 0 3.175 0)
 				(effects
 					(font
 						(size 1.27 1.27)
@@ -1948,12 +1948,11 @@
 					(justify left)
 				)
 			)
-			(property "Footprint" "Package_TO_SOT_THT:TO-92_Inline"
-				(at 0 -5.08 0)
+			(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
+				(at 0 5.715 0)
 				(effects
 					(font
 						(size 1.27 1.27)
-						(italic yes)
 					)
 					(hide yes)
 				)
@@ -1967,7 +1966,7 @@
 					(hide yes)
 				)
 			)
-			(property "Description" "250mA Low Quiscent Current LDO, 3.3V output, TO-92"
+			(property "Description" "250mA Low Quiscent Current LDO, 3.3V output, SOT-23"
 				(at 0 0 0)
 				(effects
 					(font
@@ -1985,7 +1984,7 @@
 					(hide yes)
 				)
 			)
-			(property "ki_fp_filters" "TO?92*"
+			(property "ki_fp_filters" "SOT?23*"
 				(at 0 0 0)
 				(effects
 					(font
@@ -1994,10 +1993,10 @@
 					(hide yes)
 				)
 			)
-			(symbol "MCP1700x-330xxTO_0_1"
+			(symbol "MCP1700x-330xxTT_0_1"
 				(rectangle
-					(start -5.08 5.08)
-					(end 5.08 -1.905)
+					(start -5.08 1.905)
+					(end 5.08 -5.08)
 					(stroke
 						(width 0.254)
 						(type default)
@@ -2007,7 +2006,7 @@
 					)
 				)
 			)
-			(symbol "MCP1700x-330xxTO_1_1"
+			(symbol "MCP1700x-330xxTT_1_1"
 				(pin power_in line
 					(at -7.62 0 0)
 					(length 2.54)
@@ -2018,7 +2017,7 @@
 							)
 						)
 					)
-					(number "2"
+					(number "3"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -2027,7 +2026,7 @@
 					)
 				)
 				(pin power_in line
-					(at 0 7.62 270)
+					(at 0 -7.62 90)
 					(length 2.54)
 					(name "GND"
 						(effects
@@ -2054,7 +2053,7 @@
 							)
 						)
 					)
-					(number "3"
+					(number "2"
 						(effects
 							(font
 								(size 1.27 1.27)
@@ -2387,6 +2386,12 @@
 		(uuid "19e2eaaf-997b-4675-be68-30b6d8824ccf")
 	)
 	(junction
+		(at 203.2 66.04)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "2682a2bb-d95c-42dd-94cd-06b8459e5c99")
+	)
+	(junction
 		(at 115.57 30.48)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -2415,12 +2420,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "b324fc4e-5088-4459-b268-01acd279883f")
-	)
-	(junction
-		(at 210.82 66.04)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "da63d0e0-d39f-443b-a5ff-54fc1567ca31")
 	)
 	(no_connect
 		(at 200.66 53.34)
@@ -2498,13 +2497,13 @@
 	)
 	(wire
 		(pts
-			(xy 217.17 45.72) (xy 217.17 59.69)
+			(xy 208.28 35.56) (xy 208.28 77.47)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "09d75578-2e55-404f-a539-aefe27cb86c3")
+		(uuid "0c37b3af-3649-4ec4-ae27-5098eaf96d0c")
 	)
 	(wire
 		(pts
@@ -2518,33 +2517,13 @@
 	)
 	(wire
 		(pts
-			(xy 205.74 35.56) (xy 205.74 77.47)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "0efe60e2-2f57-4d3a-8707-4d278386e263")
-	)
-	(wire
-		(pts
 			(xy 217.17 59.69) (xy 226.06 59.69)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "145ec18b-c9fe-40fe-8deb-1ee1ca7b7a86")
-	)
-	(wire
-		(pts
-			(xy 238.76 59.69) (xy 238.76 66.04)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "1a23099b-3af1-4a3c-ba8c-b905151d2e89")
+		(uuid "170c9878-e744-4050-a49e-a9f3048eb24c")
 	)
 	(wire
 		(pts
@@ -2598,13 +2577,33 @@
 	)
 	(wire
 		(pts
-			(xy 210.82 66.04) (xy 210.82 77.47)
+			(xy 205.74 77.47) (xy 205.74 33.02)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "2c656a3c-ee4a-46bb-ac9b-32824809197f")
+		(uuid "2e208164-9dc9-4af4-9811-19062ce6f142")
+	)
+	(wire
+		(pts
+			(xy 238.76 62.23) (xy 238.76 66.04)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "30758d23-b1e6-4fc3-9db0-4e193fbf32c5")
+	)
+	(wire
+		(pts
+			(xy 205.74 33.02) (xy 200.66 33.02)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "31d0b5db-fbcf-422a-b60e-afcf12d3b615")
 	)
 	(wire
 		(pts
@@ -2638,7 +2637,7 @@
 	)
 	(wire
 		(pts
-			(xy 200.66 48.26) (xy 203.2 48.26)
+			(xy 200.66 48.26) (xy 210.82 48.26)
 		)
 		(stroke
 			(width 0)
@@ -2678,13 +2677,33 @@
 	)
 	(wire
 		(pts
-			(xy 200.66 35.56) (xy 205.74 35.56)
+			(xy 236.22 62.23) (xy 238.76 62.23)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4c5566a1-b76f-4aa5-9319-4fa6ae7214f2")
+	)
+	(wire
+		(pts
+			(xy 200.66 35.56) (xy 208.28 35.56)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "54755d71-278a-4cea-910c-ac10c5a59df9")
+	)
+	(wire
+		(pts
+			(xy 217.17 45.72) (xy 217.17 59.69)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5a71d4af-9690-4fbf-9867-33425e7680cc")
 	)
 	(wire
 		(pts
@@ -2718,17 +2737,17 @@
 	)
 	(wire
 		(pts
-			(xy 208.28 33.02) (xy 208.28 77.47)
+			(xy 210.82 48.26) (xy 210.82 77.47)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "7d77b140-9ef2-4b3c-850d-e2d88eae4cf1")
+		(uuid "6cf76128-79bd-4b85-a93e-b49492c79d33")
 	)
 	(wire
 		(pts
-			(xy 210.82 66.04) (xy 238.76 66.04)
+			(xy 154.94 66.04) (xy 203.2 66.04)
 		)
 		(stroke
 			(width 0)
@@ -2778,16 +2797,6 @@
 	)
 	(wire
 		(pts
-			(xy 236.22 59.69) (xy 238.76 59.69)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "bb2b83bc-e03d-40a8-b129-bc6900ea41d2")
-	)
-	(wire
-		(pts
 			(xy 138.43 33.02) (xy 154.94 33.02)
 		)
 		(stroke
@@ -2818,6 +2827,16 @@
 	)
 	(wire
 		(pts
+			(xy 203.2 66.04) (xy 238.76 66.04)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cd4d6969-ffbb-451f-b4fc-3ddfaf4b3984")
+	)
+	(wire
+		(pts
 			(xy 96.52 60.96) (xy 102.87 60.96)
 		)
 		(stroke
@@ -2825,6 +2844,16 @@
 			(type default)
 		)
 		(uuid "cf92736a-4dd5-4d39-9747-72c822d3a9e9")
+	)
+	(wire
+		(pts
+			(xy 203.2 66.04) (xy 203.2 77.47)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cfd145cb-208f-4475-ae32-f3a841c0f49c")
 	)
 	(wire
 		(pts
@@ -2858,36 +2887,6 @@
 	)
 	(wire
 		(pts
-			(xy 154.94 66.04) (xy 210.82 66.04)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f481a7af-fa73-472f-9a07-e424423fb9e7")
-	)
-	(wire
-		(pts
-			(xy 200.66 33.02) (xy 208.28 33.02)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f5b134c8-db8e-4458-9d8f-a1927dd40f76")
-	)
-	(wire
-		(pts
-			(xy 203.2 48.26) (xy 203.2 77.47)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f95bab77-cf6d-4985-a4db-e6fad530e39d")
-	)
-	(wire
-		(pts
 			(xy 154.94 58.42) (xy 149.86 58.42)
 		)
 		(stroke
@@ -2905,6 +2904,76 @@
 			(type default)
 		)
 		(uuid "fd78b214-0659-466c-a17f-d77c67e81800")
+	)
+	(symbol
+		(lib_id "Regulator_Linear:MCP1700x-330xxTT")
+		(at 120.65 60.96 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "020e297b-d436-44dd-b9fa-7eabb5c5578f")
+		(property "Reference" "U3"
+			(at 120.65 54.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "MCP1700x-330xxTT"
+			(at 120.65 57.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
+			(at 120.65 55.245 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "http://ww1.microchip.com/downloads/en/DeviceDoc/20001826D.pdf"
+			(at 120.65 60.96 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "250mA Low Quiscent Current LDO, 3.3V output, SOT-23"
+			(at 120.65 60.96 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "3"
+			(uuid "37edb1c4-da23-44d6-9cd8-d0156e114c2f")
+		)
+		(pin "1"
+			(uuid "4dc78368-2d34-4c63-9147-6296e1b82952")
+		)
+		(pin "2"
+			(uuid "2b6103d3-14ea-49a8-ba97-a313740a492b")
+		)
+		(instances
+			(project ""
+				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
+					(reference "U3")
+					(unit 1)
+				)
+			)
+		)
 	)
 	(symbol
 		(lib_name "GND_5")
@@ -3047,12 +3116,12 @@
 	(symbol
 		(lib_id "Switch:SW_MEC_5E")
 		(at 231.14 62.23 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "0c632c73-37d6-4002-8ed0-ab53b3403a6b")
 		(property "Reference" "SW1"
 			(at 231.14 52.07 0)
@@ -4217,78 +4286,6 @@
 			(project ""
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "#PWR05")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Regulator_Linear:MCP1700x-330xxTO")
-		(at 120.65 60.96 0)
-		(mirror x)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "a5ffddbf-f6ba-477d-a4fe-9690c87ded06")
-		(property "Reference" "U2"
-			(at 120.65 54.61 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "MCP1700x-330xxTO"
-			(at 120.65 57.15 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" "Package_TO_SOT_SMD:SOT-23-3"
-			(at 120.65 55.88 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-					(italic yes)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "http://ww1.microchip.com/downloads/en/DeviceDoc/20001826D.pdf"
-			(at 120.65 60.96 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "250mA Low Quiscent Current LDO, 3.3V output, TO-92"
-			(at 120.65 60.96 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "1"
-			(uuid "95714263-f262-4d36-81d8-0c8369a57328")
-		)
-		(pin "3"
-			(uuid "d6eeacfd-916d-4136-a03c-9825c5cce462")
-		)
-		(pin "2"
-			(uuid "d9b444f3-e555-456f-a2de-f263d11f0516")
-		)
-		(instances
-			(project ""
-				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
-					(reference "U2")
 					(unit 1)
 				)
 			)
