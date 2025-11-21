@@ -5,7 +5,6 @@
  */
 
 / {
-
 	power {
 		compatible = "gpio-keys";
 		probe_1_divider_power: probe_1_divider_power {
@@ -82,12 +81,19 @@
 	ranges = <0x0 0x20000000  0x40000>;
 };
 
-// TODO: re-enable HWFC once it's fixed
 &uart20 {
-	/delete-property/ hw-flow-control;
+	status = "disabled";
+};
+
+&uart30 {
+	status = "disabled";
 };
 
 &mx25r64 {
+	status = "disabled";
+};
+
+&pwm20 {
 	status = "disabled";
 };
 
