@@ -132,7 +132,8 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t data)
 
 		gpio_pin_set_dt(&indicator_led, 0);
 
-		k_timer_start(&sSensorTimer, K_MSEC(30000), K_NO_WAIT);
+		// Wait a 1s and fire the timer, then fire every 30s
+		k_timer_start(&sSensorTimer, K_MSEC(1000), K_MSEC(30000));
 	}
 	else if (isBleConnected)
 	{
