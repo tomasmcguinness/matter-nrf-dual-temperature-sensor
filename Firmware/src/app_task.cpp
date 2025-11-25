@@ -326,9 +326,7 @@ double read_probe_temperature(int probe_number)
 		return -1;
 	}
 
-	// uint16_t ref_internal = adc_ref_internal(adc_channel.dev);
-
-	float resistance = (val_mv * SERIESRESISTOR) / (1800 /* Ref voltage of 900 with a GAIN of 1_2 */ - val_mv);
+	float resistance = (val_mv * SERIESRESISTOR) / (2200 /* Ref voltage of 900 with a GAIN of 1_2 */ - val_mv);
 
 	double steinhart;
 	steinhart = resistance / THERMISTORNOMINAL;		  // (R/Ro)
@@ -341,8 +339,7 @@ double read_probe_temperature(int probe_number)
 	double value = steinhart;
 
 	LOG_INF("ADC CHANNEL %d", channel);
-	// LOG_INF("Reference %d mV", ref_internal);
-	// LOG_INF("A: %d", adc_sequence);
+	LOG_INF("A: %d", adc_sequence);
 	LOG_INF("V: %" PRId32 " mV", val_mv);
 	LOG_INF("R: %d", (int)resistance);
 	LOG_INF("T: %f", value);
@@ -361,6 +358,7 @@ void AppTask::SensorMeasureHandler()
 	gpio_pin_set_dt(&probe_1_divider_power, 0);
 
 	// Leave a small gap between each reading.
+	//
 	k_sleep(K_MSEC(50));
 
 	gpio_pin_set_dt(&probe_2_divider_power, 1);
