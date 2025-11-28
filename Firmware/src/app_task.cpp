@@ -339,7 +339,7 @@ double read_probe_temperature(int probe_number)
 	double value = steinhart;
 
 	LOG_INF("ADC CHANNEL %d", channel);
-	LOG_INF("A: %d", adc_sequence);
+	//LOG_INF("A: %d", adc_sequence);
 	LOG_INF("V: %" PRId32 " mV", val_mv);
 	LOG_INF("R: %d", (int)resistance);
 	LOG_INF("T: %f", value);
