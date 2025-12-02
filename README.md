@@ -10,8 +10,8 @@ west build -p -b nrf54l15dk/nrf54l15/cpuapp -- -DFILE_SUFFIX=minewsemi
 
 ## Firmware
 
-- [*] Implement ADC
-- [*] Add two temperature probes
-- [*] Basic indicator LED (without DK)
+- [x] Implement ADC
+- [x] Add two temperature probes
+- [x] Basic indicator LED (without DK)
 - [ ] Press and hold to reset
 - [ ] User labels to name the probes
