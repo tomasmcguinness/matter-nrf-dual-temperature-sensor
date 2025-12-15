@@ -70,18 +70,24 @@ constexpr EndpointId kLightEndpointId = 0;
 
 Identify sIdentify = {kLightEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator};
 
+/// @brief This function is called when an identify start command is received. It will rapidly blink the indicator LED.
+/// @param  
 void AppTask::IdentifyStartHandler(Identify *)
 {
 	k_timer_stop(&sIndicatorTimer);
 	k_timer_start(&sIndicatorTimer, K_MSEC(500), K_MSEC(500));
 }
 
+/// @brief This function is called when an identify stop command is received. It will turn off the indicator LED.
+/// @param  
 void AppTask::IdentifyStopHandler(Identify *)
 {
 	k_timer_stop(&sIndicatorTimer);
 	gpio_pin_set_dt(&indicator_led, 0);
 }
 
+/// @brief This callback is called when the sensor timer expires. It will post a task to read the temperature sensors.
+/// @param timer 
 void AppTask::SensorTimerCallback(k_timer *timer)
 {
 	Nrf::PostTask([]
@@ -193,11 +199,13 @@ void AppTask::ResetButtonCallback(const struct device *dev, struct gpio_callback
 {
 	LOG_INF("Reset Button Clicked");
 
+	// sys_reboot(SYS_REBOOT_WARM);
+
 	// Check if the button is pressed.
 	//
-	if (gpio_pin_get_dt(&reset_button) == 0)
+	if (gpio_pin_get_dt(&reset_button) == 1)
 	{
-		k_timer_start(&sFactoryResetTimer, K_SECONDS(10), K_NO_WAIT);
+		k_timer_start(&sFactoryResetTimer, K_SECONDS(5), K_NO_WAIT);
 	}
 	else
 	{
