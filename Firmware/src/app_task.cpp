@@ -139,7 +139,7 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t data)
 		gpio_pin_set_dt(&indicator_led, 0);
 
 		// Wait a 1s and fire the timer, then fire every 30s
-		k_timer_start(&sSensorTimer, K_MSEC(1000), K_MSEC(30000));
+		k_timer_start(&sSensorTimer, K_MSEC(1000), K_MSEC(5000));
 	}
 	else if (isBleConnected)
 	{
@@ -265,8 +265,6 @@ void AppTask::ConfigureGPIO()
 		LOG_ERR("Cannot configure indicator LED");
 		return;
 	}
-
-	LOG_ERR("Indicator LED is ready");
 
 	err = gpio_pin_configure_dt(&indicator_led, GPIO_OUTPUT_INACTIVE);
 	if (err != 0)
