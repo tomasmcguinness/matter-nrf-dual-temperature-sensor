@@ -348,7 +348,7 @@ double read_probe_temperature(int probe_number)
 	//LOG_INF("A: %d", adc_sequence);
 	LOG_INF("V: %" PRId32 " mV", val_mv);
 	LOG_INF("R: %d", (int)resistance);
-	LOG_INF("T: %f", value);
+	//LOG_INF("T: %d", value);
 
 	return value;
 }
