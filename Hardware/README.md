@@ -5,8 +5,6 @@ This page is just a scratch pad as I try to figure out the bill of materials.
 LDO
 MCP1700T-2202E/TT
 
-Resistors
-
 Push Button
 TS04-66-48-BK-100-SMT
 

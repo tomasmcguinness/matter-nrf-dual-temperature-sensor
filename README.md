@@ -2,16 +2,14 @@
 
 ## Firmware
 
-To compile the firmware, run the following command in your West environment
-
-```
-west build -p -b nrf54l15dk/nrf54l15/cpuapp -- -DFILE_SUFFIX=minewsemi
-```
-
-## Firmware
+### TODO
 
 - [x] Implement ADC
 - [x] Add two temperature probes
 - [x] Basic indicator LED (without DK)
 - [x] Press and hold to reset
 - [ ] User labels to name the probes
+
+## Hardware
+
+There is a PCB design 
