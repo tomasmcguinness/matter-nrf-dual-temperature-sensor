@@ -40,6 +40,8 @@ bool mIndicatorState;
 #error "No suitable devicetree overlay specified"
 #endif
 
+#define SENSOR_READ_INTERVAL 5000
+
 // TODO Move this to configuration (Maybe even Matter?), so they can be easily changed.
 //
 #define THERMISTORNOMINAL 10000
@@ -116,14 +118,10 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t data)
 
 	switch (event->Type)
 	{
-	case DeviceEventType::kServiceProvisioningChange:
-		LOG_INF("Provisioning changed!");
-		break;
 	case DeviceEventType::kCHIPoBLEAdvertisingChange:
 		isBleConnected = ConnectivityMgr().NumBLEConnections() != 0;
 		break;
 	case DeviceEventType::kThreadStateChange:
-	case DeviceEventType::kWiFiConnectivityChange:
 		isNetworkProvisioned = ConnectivityMgrImpl().IsIPv6NetworkProvisioned() && ConnectivityMgrImpl().IsIPv6NetworkEnabled();
 		break;
 	default:
@@ -138,8 +136,8 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t data)
 
 		gpio_pin_set_dt(&indicator_led, 0);
 
-		// Wait a 1s and fire the timer, then fire every 30s
-		k_timer_start(&sSensorTimer, K_MSEC(1000), K_MSEC(5000));
+		// Wait 1s then fire the timer, then fire every 30s
+		k_timer_start(&sSensorTimer, K_MSEC(1000), K_MSEC(SENSOR_READ_INTERVAL));
 	}
 	else if (isBleConnected)
 	{
@@ -173,6 +171,14 @@ CHIP_ERROR AppTask::Init()
 	ReturnErrorOnFailure(Nrf::Matter::RegisterEventHandler(AppTask::MatterEventHandler, 0));
 
 	ConfigureGPIO();
+
+	// Turn o off the indicator LED to start with.
+	//
+	gpio_pin_set_dt(&indicator_led, 1);
+
+	k_sleep(K_SECONDS(1));
+
+	gpio_pin_set_dt(&indicator_led, 0);
 
 	k_timer_init(&sSensorTimer, &SensorTimerCallback, nullptr);
 	k_timer_user_data_set(&sSensorTimer, this);
@@ -310,7 +316,7 @@ double read_probe_temperature(int probe_number)
 
 	if (err < 0)
 	{
-		LOG_INF("Could initialise ADC%d (%d)", channel, err);
+		LOG_ERR("Could not initialise ADC%d (%d)", channel, err);
 		return -1;
 	}
 
@@ -318,7 +324,7 @@ double read_probe_temperature(int probe_number)
 
 	if (err < 0)
 	{
-		LOG_INF("Could not read ADC%d (%d)", channel, err);
+		LOG_ERR("Could not read ADC%d (%d)", channel, err);
 		return -1;
 	}
 
@@ -360,6 +366,7 @@ void AppTask::SensorMeasureHandler()
 	//
 	gpio_pin_set_dt(&probe_1_divider_power, 1);
 	k_sleep(K_MSEC(50));
+
 	int16_t probe_1_temperature = read_probe_temperature(1) * 100; // Convert temperature to Matter
 	gpio_pin_set_dt(&probe_1_divider_power, 0);
 
@@ -369,6 +376,7 @@ void AppTask::SensorMeasureHandler()
 
 	gpio_pin_set_dt(&probe_2_divider_power, 1);
 	k_sleep(K_MSEC(50));
+	
 	int16_t probe_2_temperature = read_probe_temperature(2) * 100; // Convert temperature to Matter
 	gpio_pin_set_dt(&probe_2_divider_power, 0);
 
