@@ -66,8 +66,6 @@ static const struct gpio_dt_spec probe_2_divider_power = GPIO_DT_SPEC_GET(PROBE_
 static const struct gpio_dt_spec indicator_led = GPIO_DT_SPEC_GET(INDICATOR_LED_NODE, gpios);
 static const struct gpio_dt_spec reset_button = GPIO_DT_SPEC_GET(RESET_BUTTON_NODE, gpios);
 
-static struct gpio_callback reset_button_cb_data;
-
 constexpr EndpointId kLightEndpointId = 0;
 
 Identify sIdentify = {kLightEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator};
@@ -108,6 +106,7 @@ void AppTask::IndicatorTimerCallback(k_timer *timer)
 void AppTask::FactoryResetTimerCallback(k_timer *timer)
 {
 	LOG_INF("Factory Reset Triggered");
+	gpio_pin_set_dt(&indicator_led, 0);
 	chip::Server::GetInstance().ScheduleFactoryReset();
 }
 
@@ -172,7 +171,8 @@ CHIP_ERROR AppTask::Init()
 
 	ConfigureGPIO();
 
-	// Turn o off the indicator LED to start with.
+	// Turn on the indicator LED to start with. 
+	// Gives an indication that the device is alive!
 	//
 	gpio_pin_set_dt(&indicator_led, 1);
 
@@ -201,7 +201,7 @@ CHIP_ERROR AppTask::StartApp()
 	return CHIP_NO_ERROR;
 }
 
-void AppTask::ResetButtonCallback(const struct device *dev, struct gpio_callback *cb, uint32_t pins)
+void AppTask::ResetButtonCallback(const struct device *dev, struct gpio_callback *cb, gpio_port_pins_t pins)
 {
 	LOG_INF("Reset Button Clicked");
 
@@ -211,10 +211,12 @@ void AppTask::ResetButtonCallback(const struct device *dev, struct gpio_callback
 	//
 	if (gpio_pin_get_dt(&reset_button) == 1)
 	{
+		gpio_pin_set_dt(&indicator_led, 1);
 		k_timer_start(&sFactoryResetTimer, K_SECONDS(5), K_NO_WAIT);
 	}
 	else
 	{
+		gpio_pin_set_dt(&indicator_led, 0);
 		k_timer_stop(&sFactoryResetTimer);
 	}
 }
@@ -287,13 +289,33 @@ void AppTask::ConfigureGPIO()
 		return;
 	}
 
-	gpio_pin_configure_dt(&reset_button, GPIO_INPUT);
+	err = gpio_pin_configure_dt(&reset_button, GPIO_INPUT | GPIO_ACTIVE_HIGH);
 
-	gpio_pin_interrupt_configure_dt(&reset_button, GPIO_INT_EDGE_BOTH);
+	if (err != 0)
+	{
+		LOG_ERR("Configuring reset button failed (err: %d)", err);
+		return;
+	}
+
+	err = gpio_pin_interrupt_configure_dt(&reset_button, GPIO_INT_EDGE_BOTH);
+
+	if (err != 0)
+	{
+		LOG_ERR("Configuring reset button interrupt failed (err: %d)", err);
+		return;
+	}
+
+	static struct gpio_callback reset_button_cb_data;
 
 	gpio_init_callback(&reset_button_cb_data, AppTask::ResetButtonCallback, BIT(reset_button.pin));
 
-	gpio_add_callback(reset_button.port, &reset_button_cb_data);
+	err = gpio_add_callback(reset_button.port, &reset_button_cb_data);
+
+	if (err != 0)
+	{
+		LOG_ERR("Adding callback to reset button failed (err: %d)", err);
+		return;
+	}
 
 	LOG_INF("Successfully configured reset button");
 }
