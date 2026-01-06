@@ -122,7 +122,7 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t data)
 		break;
 	case DeviceEventType::kThreadStateChange:
 		isNetworkProvisioned = ConnectivityMgrImpl().IsIPv6NetworkProvisioned() && ConnectivityMgrImpl().IsIPv6NetworkEnabled();
-		break;
+		break;	
 	default:
 		break;
 	}

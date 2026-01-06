@@ -2,6 +2,8 @@
 
 ## Compiling
 
+This code has been developed against NCS v3.1.0.
+
 To build for the PCB that is part of this project, use this command
 
 ```
