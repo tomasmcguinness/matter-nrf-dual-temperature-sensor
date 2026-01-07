@@ -56,7 +56,7 @@
   {}
 
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 119
+#define GENERATED_ATTRIBUTE_COUNT 125
 #define GENERATED_ATTRIBUTES                                                   \
   {                                                                            \
                                                                                \
@@ -315,6 +315,14 @@
         {ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                 \
          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)}, /* ClusterRevision */          \
                                                                                \
+        /* Endpoint: 1, Cluster: Fixed Label (server) */                       \
+        {ZAP_EMPTY_DEFAULT(), 0x00000000, 0, ZAP_TYPE(ARRAY),                  \
+         ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)}, /* LabelList */                \
+        {ZAP_SIMPLE_DEFAULT(0), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),             \
+         0}, /* FeatureMap */                                                  \
+        {ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U),               \
+         0}, /* ClusterRevision */                                             \
+                                                                               \
         /* Endpoint: 1, Cluster: Temperature Measurement (server) */           \
         {ZAP_EMPTY_DEFAULT(), 0x00000000, 2, ZAP_TYPE(TEMPERATURE),            \
          ZAP_ATTRIBUTE_MASK(NULLABLE)}, /* MeasuredValue */                    \
@@ -350,6 +358,14 @@
          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)}, /* FeatureMap */               \
         {ZAP_EMPTY_DEFAULT(), 0x0000FFFD, 2, ZAP_TYPE(INT16U),                 \
          ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)}, /* ClusterRevision */          \
+                                                                               \
+        /* Endpoint: 2, Cluster: Fixed Label (server) */                       \
+        {ZAP_EMPTY_DEFAULT(), 0x00000000, 0, ZAP_TYPE(ARRAY),                  \
+         ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)}, /* LabelList */                \
+        {ZAP_SIMPLE_DEFAULT(0), 0x0000FFFC, 4, ZAP_TYPE(BITMAP32),             \
+         0}, /* FeatureMap */                                                  \
+        {ZAP_SIMPLE_DEFAULT(1), 0x0000FFFD, 2, ZAP_TYPE(INT16U),               \
+         0}, /* ClusterRevision */                                             \
                                                                                \
         /* Endpoint: 2, Cluster: Temperature Measurement (server) */           \
         {ZAP_EMPTY_DEFAULT(), 0x00000000, 2, ZAP_TYPE(TEMPERATURE),            \
@@ -481,7 +497,7 @@
 // clang-format on
 
 // This is an array of EmberAfCluster structures.
-#define GENERATED_CLUSTER_COUNT 18
+#define GENERATED_CLUSTER_COUNT 20
 // clang-format off
 #define GENERATED_CLUSTERS { \
   { \
@@ -667,9 +683,22 @@
       .eventCount = 0, \
     },\
   { \
+      /* Endpoint: 1, Cluster: Fixed Label (server) */ \
+      .clusterId = 0x00000040, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(99), \
+      .attributeCount = 3, \
+      .clusterSize = 6, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr, \
+      .generatedCommandList = nullptr, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
+    },\
+  { \
       /* Endpoint: 1, Cluster: Temperature Measurement (server) */ \
       .clusterId = 0x00000402, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(99), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(102), \
       .attributeCount = 5, \
       .clusterSize = 12, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -682,7 +711,7 @@
   { \
       /* Endpoint: 2, Cluster: Identify (server) */ \
       .clusterId = 0x00000003, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(104), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(107), \
       .attributeCount = 4, \
       .clusterSize = 9, \
       .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), \
@@ -695,7 +724,7 @@
   { \
       /* Endpoint: 2, Cluster: Descriptor (server) */ \
       .clusterId = 0x0000001D, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(108), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(111), \
       .attributeCount = 6, \
       .clusterSize = 0, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -706,9 +735,22 @@
       .eventCount = 0, \
     },\
   { \
+      /* Endpoint: 2, Cluster: Fixed Label (server) */ \
+      .clusterId = 0x00000040, \
+      .attributes = ZAP_ATTRIBUTE_INDEX(117), \
+      .attributeCount = 3, \
+      .clusterSize = 6, \
+      .mask = ZAP_CLUSTER_MASK(SERVER), \
+      .functions = NULL, \
+      .acceptedCommandList = nullptr, \
+      .generatedCommandList = nullptr, \
+      .eventList = nullptr, \
+      .eventCount = 0, \
+    },\
+  { \
       /* Endpoint: 2, Cluster: Temperature Measurement (server) */ \
       .clusterId = 0x00000402, \
-      .attributes = ZAP_ATTRIBUTE_INDEX(114), \
+      .attributes = ZAP_ATTRIBUTE_INDEX(120), \
       .attributeCount = 5, \
       .clusterSize = 12, \
       .mask = ZAP_CLUSTER_MASK(SERVER), \
@@ -722,13 +764,13 @@
 
 // clang-format on
 
-#define ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT 17
+#define ZAP_FIXED_ENDPOINT_DATA_VERSION_COUNT 19
 
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                               \
   {                                                                            \
-    {ZAP_CLUSTER_INDEX(0), 12, 81}, {ZAP_CLUSTER_INDEX(12), 3, 21},            \
-        {ZAP_CLUSTER_INDEX(15), 3, 21},                                        \
+    {ZAP_CLUSTER_INDEX(0), 12, 81}, {ZAP_CLUSTER_INDEX(12), 4, 27},            \
+        {ZAP_CLUSTER_INDEX(16), 4, 27},                                        \
   }
 
 // Largest attribute size is needed for various buffers
@@ -741,7 +783,7 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define ATTRIBUTE_SINGLETONS_SIZE (35)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (123)
+#define ATTRIBUTE_MAX_SIZE (135)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (3)

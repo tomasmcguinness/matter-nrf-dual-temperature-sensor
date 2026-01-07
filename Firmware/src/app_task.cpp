@@ -25,6 +25,8 @@
 #include <zephyr/drivers/gpio.h>
 #include <math.h>
 
+#include "DeviceInfoProviderImpl.h"
+
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip;
@@ -162,7 +164,7 @@ CHIP_ERROR AppTask::Init()
 {
 	LOG_INF("Init()");
 
-	ReturnErrorOnFailure(Nrf::Matter::PrepareServer());
+	ReturnErrorOnFailure(Nrf::Matter::PrepareServer(Nrf::Matter::InitData{.mDeviceInfoProvider = &DeviceInfoProviderImpl::GetDefaultInstance() }));
 
 	k_timer_init(&sIndicatorTimer, &IndicatorTimerCallback, nullptr);
 	k_timer_user_data_set(&sIndicatorTimer, this);
