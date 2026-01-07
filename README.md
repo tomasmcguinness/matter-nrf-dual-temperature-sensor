@@ -12,7 +12,7 @@ This is my Matter Dual Temperature Sensor
 - [x] Add two temperature probes
 - [x] Basic indicator LED (without DK)
 - [x] Press and hold to reset
-- [ ] User labels to name the probes
+- [x] User labels to name the probes
 
 ## Hardware
 
