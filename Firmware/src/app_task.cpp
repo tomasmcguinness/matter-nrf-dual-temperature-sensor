@@ -16,9 +16,6 @@
 
 #include <zephyr/logging/log.h>
 
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/identify-server/identify-server.h>
-
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/adc.h>
@@ -26,6 +23,11 @@
 #include <math.h>
 
 #include "DeviceInfoProviderImpl.h"
+
+#include <app-common/zap-generated/callback.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/power-source-server/power-source-server.h>
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
@@ -73,7 +75,7 @@ constexpr EndpointId kLightEndpointId = 0;
 Identify sIdentify = {kLightEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator};
 
 /// @brief This function is called when an identify start command is received. It will rapidly blink the indicator LED.
-/// @param  
+/// @param
 void AppTask::IdentifyStartHandler(Identify *)
 {
 	k_timer_stop(&sIndicatorTimer);
@@ -81,7 +83,7 @@ void AppTask::IdentifyStartHandler(Identify *)
 }
 
 /// @brief This function is called when an identify stop command is received. It will turn off the indicator LED.
-/// @param  
+/// @param
 void AppTask::IdentifyStopHandler(Identify *)
 {
 	k_timer_stop(&sIndicatorTimer);
@@ -89,7 +91,7 @@ void AppTask::IdentifyStopHandler(Identify *)
 }
 
 /// @brief This callback is called when the sensor timer expires. It will post a task to read the temperature sensors.
-/// @param timer 
+/// @param timer
 void AppTask::SensorTimerCallback(k_timer *timer)
 {
 	Nrf::PostTask([]
@@ -124,7 +126,7 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t data)
 		break;
 	case DeviceEventType::kThreadStateChange:
 		isNetworkProvisioned = ConnectivityMgrImpl().IsIPv6NetworkProvisioned() && ConnectivityMgrImpl().IsIPv6NetworkEnabled();
-		break;	
+		break;
 	default:
 		break;
 	}
@@ -164,7 +166,7 @@ CHIP_ERROR AppTask::Init()
 {
 	LOG_INF("Init()");
 
-	ReturnErrorOnFailure(Nrf::Matter::PrepareServer(Nrf::Matter::InitData{.mDeviceInfoProvider = &DeviceInfoProviderImpl::GetDefaultInstance() }));
+	ReturnErrorOnFailure(Nrf::Matter::PrepareServer(Nrf::Matter::InitData{.mDeviceInfoProvider = &DeviceInfoProviderImpl::GetDefaultInstance()}));
 
 	k_timer_init(&sIndicatorTimer, &IndicatorTimerCallback, nullptr);
 	k_timer_user_data_set(&sIndicatorTimer, this);
@@ -173,7 +175,7 @@ CHIP_ERROR AppTask::Init()
 
 	ConfigureGPIO();
 
-	// Turn on the indicator LED to start with. 
+	// Turn on the indicator LED to start with.
 	// Gives an indication that the device is alive!
 	//
 	gpio_pin_set_dt(&indicator_led, 1);
@@ -375,17 +377,17 @@ double read_probe_temperature(int probe_number)
 	double value = steinhart;
 
 	LOG_INF("ADC CHANNEL %d", channel);
-	//LOG_INF("A: %d", adc_sequence);
+	// LOG_INF("A: %d", adc_sequence);
 	LOG_INF("V: %" PRId32 " mV", val_mv);
 	LOG_INF("R: %d", (int)resistance);
-	//LOG_INF("T: %d", value);
+	// LOG_INF("T: %d", value);
 
 	return value;
 }
 
 void AppTask::SensorMeasureHandler()
 {
-	// Switch on the power pins. Let the power stay on for a short period of 
+	// Switch on the power pins. Let the power stay on for a short period of
 	// time so the voltage stabalises.
 	//
 	gpio_pin_set_dt(&probe_1_divider_power, 1);
@@ -400,7 +402,7 @@ void AppTask::SensorMeasureHandler()
 
 	gpio_pin_set_dt(&probe_2_divider_power, 1);
 	k_sleep(K_MSEC(50));
-	
+
 	int16_t probe_2_temperature = read_probe_temperature(2) * 100; // Convert temperature to Matter
 	gpio_pin_set_dt(&probe_2_divider_power, 0);
 
@@ -408,4 +410,35 @@ void AppTask::SensorMeasureHandler()
 	//
 	chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, probe_1_temperature);
 	chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(2, probe_2_temperature);
+}
+
+/// @brief Customises the PowerSource cluster.
+/// @param endpoint
+void emberAfPowerSourceClusterInitCallback(chip::EndpointId endpoint)
+{
+	LOG_INF("emberAfPowerSourceClusterServerInitCallback()");
+
+	uint32_t featureMap = 0;
+
+#ifdef CONFIG_PM_DEVICE
+	featureMap = 0x01; // BAT
+#else
+	featureMap = 0x00; // WIRED
+#endif
+
+	Clusters::PowerSource::Attributes::FeatureMap::Set(endpoint, featureMap);
+
+	Clusters::PowerSource::Attributes::Status::Set(endpoint, Clusters::PowerSource::PowerSourceStatusEnum::kActive);
+
+	Clusters::PowerSource::Attributes::Order::Set(endpoint, 0);
+
+	Clusters::PowerSource::Attributes::Description::Set(endpoint, chip::CharSpan::fromCharString("Power"));
+
+#ifdef CONFIG_PM_DEVICE
+	Clusters::PowerSource::Attributes::BatChargeLevel::Set(endpoint, Clusters::PowerSource::BatChargeLevelEnum::kOk);
+	Clusters::PowerSource::Attributes::BatReplacementNeeded::Set(endpoint, false);
+	Clusters::PowerSource::Attributes::BatReplaceability::Set(endpoint, Clusters::PowerSource::BatReplaceabilityEnum::kUserReplaceable);
+#else
+	Clusters::PowerSource::Attributes::WiredCurrentType::Set(endpoint, Clusters::PowerSource::WiredCurrentTypeEnum::kDc);
+#endif
 }
