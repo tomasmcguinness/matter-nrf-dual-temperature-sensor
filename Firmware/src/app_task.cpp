@@ -207,10 +207,11 @@ CHIP_ERROR AppTask::StartApp()
 
 void AppTask::ResetButtonCallback(const struct device *dev, struct gpio_callback *cb, gpio_port_pins_t pins)
 {
-#ifdef CONFIG_CHIP_ICD_UAT_SUPPORT
-	LOG_INF("ICD UserActiveMode has been triggered.");
-	Server::GetInstance().GetICDManager().OnNetworkActivity();
-#endif
+	// This crashes :(
+// #ifdef CONFIG_CHIP_ICD_UAT_SUPPORT
+// 	LOG_INF("ICD UserActiveMode has been triggered.");
+// 	Server::GetInstance().GetICDManager().OnNetworkActivity();
+// #endif
 
 	// sys_reboot(SYS_REBOOT_WARM);
 
