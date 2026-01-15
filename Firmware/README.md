@@ -23,3 +23,17 @@ To compile for the nRF54L15-DK, use this command
 ```
 west build -p -b nrf54l15dk/nrf54l15/cpuapp -- -DEXTRA_CONF_FILE=prj_battery.conf
 ```
+
+## Flashing
+
+To flash the firmware, run the following command
+
+```
+west flash
+```
+
+If the device has protected firmware, like the MinewSemi ME54BS01, you can provide the recover flag
+
+```
+west flash --recover
+```
