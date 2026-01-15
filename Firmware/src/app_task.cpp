@@ -100,7 +100,7 @@ void AppTask::SensorTimerCallback(k_timer *timer)
 
 void AppTask::IndicatorTimerCallback(k_timer *timer)
 {
-	LOG_INF("LED Indicator: %d", mIndicatorState);
+	LOG_DBG("LED Indicator: %d", mIndicatorState);
 
 	mIndicatorState = !mIndicatorState;
 
@@ -109,7 +109,7 @@ void AppTask::IndicatorTimerCallback(k_timer *timer)
 
 void AppTask::FactoryResetTimerCallback(k_timer *timer)
 {
-	LOG_INF("Factory Reset Triggered");
+	LOG_INF("Factory Reset Triggered!");
 	gpio_pin_set_dt(&indicator_led, 0);
 	chip::Server::GetInstance().ScheduleFactoryReset();
 }
@@ -139,7 +139,7 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t data)
 
 		gpio_pin_set_dt(&indicator_led, 0);
 
-		// Wait 1s then fire the timer, then fire every 30s
+		// Wait 1s then fire the timer, then fire every READ_INTERVAL
 		k_timer_start(&sSensorTimer, K_MSEC(1000), K_MSEC(SENSOR_READ_INTERVAL));
 	}
 	else if (isBleConnected)
@@ -207,7 +207,10 @@ CHIP_ERROR AppTask::StartApp()
 
 void AppTask::ResetButtonCallback(const struct device *dev, struct gpio_callback *cb, gpio_port_pins_t pins)
 {
-	LOG_INF("Reset Button Clicked");
+#ifdef CONFIG_CHIP_ICD_UAT_SUPPORT
+	LOG_INF("ICD UserActiveMode has been triggered.");
+	Server::GetInstance().GetICDManager().OnNetworkActivity();
+#endif
 
 	// sys_reboot(SYS_REBOOT_WARM);
 
@@ -215,11 +218,15 @@ void AppTask::ResetButtonCallback(const struct device *dev, struct gpio_callback
 	//
 	if (gpio_pin_get_dt(&reset_button) == 1)
 	{
+		LOG_INF("Reset Button Pushed");
+
 		gpio_pin_set_dt(&indicator_led, 1);
 		k_timer_start(&sFactoryResetTimer, K_SECONDS(5), K_NO_WAIT);
 	}
 	else
 	{
+		LOG_INF("Reset Button Released");
+
 		gpio_pin_set_dt(&indicator_led, 0);
 		k_timer_stop(&sFactoryResetTimer);
 	}
@@ -417,16 +424,6 @@ void AppTask::SensorMeasureHandler()
 void emberAfPowerSourceClusterInitCallback(chip::EndpointId endpoint)
 {
 	LOG_INF("emberAfPowerSourceClusterServerInitCallback()");
-
-	uint32_t featureMap = 0;
-
-#ifdef CONFIG_PM_DEVICE
-	featureMap = 0x01; // BAT
-#else
-	featureMap = 0x00; // WIRED
-#endif
-
-	Clusters::PowerSource::Attributes::FeatureMap::Set(endpoint, featureMap);
 
 	Clusters::PowerSource::Attributes::Status::Set(endpoint, Clusters::PowerSource::PowerSourceStatusEnum::kActive);
 
