@@ -34,8 +34,6 @@
 	};
 
 	aliases {
-		// Use watchdog wdt31 as the application watchdog
-		watchdog0 = &wdt31;
 		indicator-led = &led0;
 		reset-button = &button0;
 	};
@@ -81,7 +79,40 @@
 	ranges = <0x0 0x20000000  0x40000>;
 };
 
+/* Disable unused communication peripherals */
+&i2c20 {
+	status = "disabled";
+};
+
+&i2c21 {
+	status = "disabled";
+};
+
+&i2c22 {
+	status = "disabled";
+};
+
+&spi20 {
+	status = "disabled";
+};
+
+&spi21 {
+	status = "disabled";
+};
+
+&spi22 {
+	status = "disabled";
+};
+
 &uart20 {
+	status = "disabled";
+};
+
+&uart21 {
+	status = "disabled";
+};
+
+&uart22 {
 	status = "disabled";
 };
 
@@ -93,10 +124,45 @@
 	status = "disabled";
 };
 
+/* Disable audio/sensor peripherals if not used */
+&pdm20 {
+	status = "disabled";
+};
+
+&pdm21 {
+	status = "disabled";
+};
+
+&i2s20 {
+	status = "disabled";
+};
+
+/* Disable quadrature decoder if not used */
+&qdec20 {
+	status = "disabled";
+};
+
+&qdec21 {
+	status = "disabled";
+};
+
 &pwm20 {
 	status = "disabled";
 };
 
+&pwm21 {
+	status = "disabled";
+};
+
+&pwm22 {
+	status = "disabled";
+};
+
 &wdt31 {
-	status = "okay";
+	status = "disabled";
+};
+
+/* Disable NFC if not used */
+&nfct {
+	status = "disabled";
 };

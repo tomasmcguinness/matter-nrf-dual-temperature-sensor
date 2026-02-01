@@ -100,7 +100,7 @@ void AppTask::SensorTimerCallback(k_timer *timer)
 
 void AppTask::IndicatorTimerCallback(k_timer *timer)
 {
-	LOG_DBG("LED Indicator: %d", mIndicatorState);
+	// LOG_DBG("LED Indicator: %d", mIndicatorState);
 
 	mIndicatorState = !mIndicatorState;
 
@@ -208,12 +208,17 @@ CHIP_ERROR AppTask::StartApp()
 void AppTask::ResetButtonCallback(const struct device *dev, struct gpio_callback *cb, gpio_port_pins_t pins)
 {
 	// This crashes :(
-// #ifdef CONFIG_CHIP_ICD_UAT_SUPPORT
-// 	LOG_INF("ICD UserActiveMode has been triggered.");
-// 	Server::GetInstance().GetICDManager().OnNetworkActivity();
-// #endif
+#ifdef CONFIG_CHIP_ICD_UAT_SUPPORT
+	// LOG_INF("ICD UserActiveMode has been triggered.");
 
-	// sys_reboot(SYS_REBOOT_WARM);
+	// chip::app::ICDManager manager = chip::Server::GetInstance().GetICDManager();
+
+	// if (manager)
+	// {
+	// 	LOG_INF("ICDManager is not null!");
+	// 	Server::GetInstance().GetICDManager().OnNetworkActivity();
+	// }
+#endif
 
 	// Check if the button is pressed.
 	//
@@ -309,7 +314,7 @@ void AppTask::ConfigureGPIO()
 		return;
 	}
 
-	err = gpio_pin_interrupt_configure_dt(&reset_button, GPIO_INT_EDGE_BOTH);
+	err = gpio_pin_interrupt_configure_dt(&reset_button, GPIO_INT_LEVEL_HIGH);
 
 	if (err != 0)
 	{
@@ -384,10 +389,9 @@ double read_probe_temperature(int probe_number)
 
 	double value = steinhart;
 
-	LOG_INF("ADC CHANNEL %d", channel);
+	LOG_INF("CHANNEL #%d: V: %" PRId32 " mV", channel, val_mv);
 	// LOG_INF("A: %d", adc_sequence);
-	LOG_INF("V: %" PRId32 " mV", val_mv);
-	LOG_INF("R: %d", (int)resistance);
+	// LOG_INF("R: %d", (int)resistance);
 	// LOG_INF("T: %d", value);
 
 	return value;
@@ -399,17 +403,17 @@ void AppTask::SensorMeasureHandler()
 	// time so the voltage stabalises.
 	//
 	gpio_pin_set_dt(&probe_1_divider_power, 1);
-	k_sleep(K_MSEC(50));
+	k_sleep(K_MSEC(2));
 
 	int16_t probe_1_temperature = read_probe_temperature(1) * 100; // Convert temperature to Matter
 	gpio_pin_set_dt(&probe_1_divider_power, 0);
 
 	// Leave a small gap between each reading.
 	//
-	k_sleep(K_MSEC(50));
+	k_sleep(K_MSEC(2));
 
 	gpio_pin_set_dt(&probe_2_divider_power, 1);
-	k_sleep(K_MSEC(50));
+	k_sleep(K_MSEC(2));
 
 	int16_t probe_2_temperature = read_probe_temperature(2) * 100; // Convert temperature to Matter
 	gpio_pin_set_dt(&probe_2_divider_power, 0);

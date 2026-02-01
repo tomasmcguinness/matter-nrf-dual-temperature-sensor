@@ -5,7 +5,7 @@
  */
 
 #include "app_task.h"
-
+#include <zephyr/pm/device.h>
 #include <zephyr/logging/log.h>
 
 LOG_MODULE_REGISTER(app, CONFIG_CHIP_APP_LOG_LEVEL);
