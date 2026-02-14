@@ -207,19 +207,6 @@ CHIP_ERROR AppTask::StartApp()
 
 void AppTask::ResetButtonCallback(const struct device *dev, struct gpio_callback *cb, gpio_port_pins_t pins)
 {
-	// This crashes :(
-#ifdef CONFIG_CHIP_ICD_UAT_SUPPORT
-	// LOG_INF("ICD UserActiveMode has been triggered.");
-
-	// chip::app::ICDManager manager = chip::Server::GetInstance().GetICDManager();
-
-	// if (manager)
-	// {
-	// 	LOG_INF("ICDManager is not null!");
-	// 	Server::GetInstance().GetICDManager().OnNetworkActivity();
-	// }
-#endif
-
 	// Check if the button is pressed.
 	//
 	if (gpio_pin_get_dt(&reset_button) == 1)
@@ -227,6 +214,17 @@ void AppTask::ResetButtonCallback(const struct device *dev, struct gpio_callback
 		LOG_INF("Reset Button Pushed");
 
 		gpio_pin_set_dt(&indicator_led, 1);
+
+#ifdef CONFIG_CHIP_ICD_UAT_SUPPORT
+		LOG_INF("ICD UserActiveMode is enabled. Moving to ActiveMode...");
+
+		chip::DeviceLayer::PlatformMgr().LockChipStack();
+		Server::GetInstance().GetICDManager().OnNetworkActivity();
+		chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+		LOG_INF("Successfully triggered ICD UserActiveMode!");
+#endif
+
 		k_timer_start(&sFactoryResetTimer, K_SECONDS(5), K_NO_WAIT);
 	}
 	else
@@ -314,7 +312,7 @@ void AppTask::ConfigureGPIO()
 		return;
 	}
 
-	err = gpio_pin_interrupt_configure_dt(&reset_button, GPIO_INT_LEVEL_HIGH);
+	err = gpio_pin_interrupt_configure_dt(&reset_button, GPIO_INT_EDGE_TO_ACTIVE);
 
 	if (err != 0)
 	{

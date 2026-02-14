@@ -43,6 +43,11 @@
 	};
 };
 
+&gpio1 {
+	status = "okay";
+	sense-edge-mask = <0xffffffff>;
+};
+
 &adc {
 	#address-cells = <1>;
 	#size-cells = <0>;
