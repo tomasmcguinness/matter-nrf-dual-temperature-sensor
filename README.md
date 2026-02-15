@@ -2,6 +2,9 @@
 
 ![20251223_184336358_iOS](https://github.com/user-attachments/assets/d63748a7-c801-4c82-87ea-a7dafc8251de)
 
+> [!NOTE]
+> This is a work in progress. 
+
 This is my Matter Dual Temperature Sensor. 
 
 It supports two NTC thermistor probes, allowing for two temperature readings.
