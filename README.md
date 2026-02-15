@@ -3,7 +3,7 @@
 ![20251223_184336358_iOS](https://github.com/user-attachments/assets/d63748a7-c801-4c82-87ea-a7dafc8251de)
 
 > [!NOTE]
-> This is a work in progress. 
+> This is a work in progress. It works, but I'm experiencing network reliability issues with the battery variation.
 
 This is my Matter Dual Temperature Sensor. 
 
@@ -31,4 +31,4 @@ The code is written using the Nordic Connect SDK, v3.1.0.
 
 ## Hardware
 
-There is a PCB design 
+There is a PCB design, which you'll find under the Firmware folder.
