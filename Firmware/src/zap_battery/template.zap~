@@ -19,7 +19,7 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../../../ncs/v3.1.0/modules/lib/matter/src/app/zap-templates/zcl/zcl.json",
+      "path": "../../../../../ncs/v3.2.0/modules/lib/matter/src/app/zap-templates/zcl/zcl.json",
       "type": "zcl-properties",
       "category": "matter",
       "version": 1,
@@ -27,7 +27,7 @@
     },
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../../../ncs/v3.1.0/modules/lib/matter/src/app/zap-templates/app-templates.json",
+      "path": "../../../../../ncs/v3.2.0/modules/lib/matter/src/app/zap-templates/app-templates.json",
       "type": "gen-templates-json",
       "category": "matter",
       "version": "chip-v1"
@@ -2793,6 +2793,14 @@
               "isEnabled": 1
             },
             {
+              "name": "RegisterClientResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 0,
+              "isEnabled": 1
+            },
+            {
               "name": "UnregisterClient",
               "code": 2,
               "mfgCode": null,
@@ -2806,6 +2814,14 @@
               "mfgCode": null,
               "source": "client",
               "isIncoming": 1,
+              "isEnabled": 1
+            },
+            {
+              "name": "StayActiveResponse",
+              "code": 4,
+              "mfgCode": null,
+              "source": "server",
+              "isIncoming": 0,
               "isEnabled": 1
             }
           ],

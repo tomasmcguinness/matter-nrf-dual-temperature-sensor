@@ -72,6 +72,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId) {
   case app::Clusters::TemperatureMeasurement::Id:
     emberAfTemperatureMeasurementClusterInitCallback(endpoint);
     break;
+  case app::Clusters::ThreadNetworkDiagnostics::Id:
+    emberAfThreadNetworkDiagnosticsClusterInitCallback(endpoint);
+    break;
   default:
     // Unrecognized cluster ID
     break;
@@ -150,6 +153,11 @@ emberAfPowerSourceClusterInitCallback(EndpointId endpoint) {
 }
 void __attribute__((weak))
 emberAfTemperatureMeasurementClusterInitCallback(EndpointId endpoint) {
+  // To prevent warning
+  (void)endpoint;
+}
+void __attribute__((weak))
+emberAfThreadNetworkDiagnosticsClusterInitCallback(EndpointId endpoint) {
   // To prevent warning
   (void)endpoint;
 }
