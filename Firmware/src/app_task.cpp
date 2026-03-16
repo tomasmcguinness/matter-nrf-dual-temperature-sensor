@@ -52,6 +52,7 @@ bool mIndicatorState;
 #define TEMPERATURENOMINAL 25
 #define BCOEFFICIENT 3977
 #define SERIESRESISTOR 10000
+#define REFVOLTAGE 2200
 
 #define DT_SPEC_AND_COMMA(node_id, prop, idx) ADC_DT_SPEC_GET_BY_IDX(node_id, idx),
 
@@ -375,7 +376,7 @@ double read_probe_temperature(int probe_number)
 		return -1;
 	}
 
-	float resistance = (val_mv * SERIESRESISTOR) / (2200 /* Ref voltage of 900 with a GAIN of 1_2 */ - val_mv);
+	float resistance = (val_mv * SERIESRESISTOR) / (REFVOLTAGE - val_mv);
 
 	double steinhart;
 	steinhart = resistance / THERMISTORNOMINAL;		  // (R/Ro)

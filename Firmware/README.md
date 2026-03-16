@@ -2,7 +2,7 @@
 
 ## Compiling
 
-This code has been developed against NCS v3.1.0.
+This code has been developed against NCS v3.2.0.
 
 There are two variations of the project. One designed for battery and one to be powered via the mains (USB). There are also `_release` variations too, that remove logging.
 
