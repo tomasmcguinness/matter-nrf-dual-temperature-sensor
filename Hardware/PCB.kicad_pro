@@ -671,7 +671,7 @@
         "uuid": "9240e15d-484a-49b3-8f80-37d1a010783e"
       }
     ],
-    "used_designators": "D1,#PWR1-2,#PWR4-5,#PWR7-9,#PWR11-22,Probe1-3,R1-7,U2-3,C1-3,SW2,Q1",
+    "used_designators": "D1,#PWR1-2,#PWR4-5,#PWR7-9,#PWR11-24,Probe1-3,R1-7,U2-3,C1-5,SW2,Q1",
     "variants": [
       {
         "name": "Battery"
