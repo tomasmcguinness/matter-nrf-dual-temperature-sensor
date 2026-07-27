@@ -50,7 +50,23 @@
         "silk_text_thickness": 0.15,
         "silk_text_upright": false,
         "zones": {
-          "min_clearance": 0.0
+          "border_display_style": 2,
+          "border_hatch_pitch": 0.5,
+          "corner_radius": 0.0,
+          "corner_smoothing": 0,
+          "fill_mode": 0,
+          "hatch_gap": 1.5,
+          "hatch_orientation": 0.0,
+          "hatch_smoothing_level": 0,
+          "hatch_smoothing_value": 0.1,
+          "hatch_thickness": 1.0,
+          "min_clearance": 0.0,
+          "min_island_area": 10.0,
+          "min_thickness": 0.25,
+          "pad_connection": 1,
+          "remove_islands": 0,
+          "thermal_relief_gap": 0.5,
+          "thermal_relief_spoke_width": 0.5
         }
       },
       "diff_pair_dimensions": [
@@ -118,6 +134,7 @@
         "too_many_vias": "error",
         "track_angle": "error",
         "track_dangling": "warning",
+        "track_not_centered_on_via": "ignore",
         "track_on_post_machined_layer": "error",
         "track_segment_length": "error",
         "track_width": "error",
@@ -239,7 +256,7 @@
       "internal_id": "",
       "mfg": "",
       "mpn": "",
-      "sch_revision": ""
+      "sch_revision": "A"
     },
     "layer_pairs": [],
     "layer_presets": [],
@@ -651,16 +668,20 @@
       {
         "filename": "PCB.kicad_sch",
         "name": "PCB",
-        "uuid": "00000000-0000-0000-0000-000000000000"
+        "uuid": "9240e15d-484a-49b3-8f80-37d1a010783e"
       }
     ],
-    "used_designators": "",
-    "variants": []
+    "used_designators": "D1,#PWR1-2,#PWR4-5,#PWR7-9,#PWR11-22,Probe1-3,R1-7,U2-3,C1-3,SW2,Q1",
+    "variants": [
+      {
+        "name": "Battery"
+      }
+    ]
   },
   "sheets": [
     [
       "9240e15d-484a-49b3-8f80-37d1a010783e",
-      "Root"
+      "PCB"
     ]
   ],
   "text_variables": {},
