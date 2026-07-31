@@ -3129,6 +3129,145 @@
 			)
 			(embedded_fonts no)
 		)
+		(symbol "power:+BATT"
+			(power global)
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "#PWR"
+				(at 0 -3.81 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "+BATT"
+				(at 0 3.556 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Power symbol creates a global label with name \"+BATT\""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "global power battery"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "+BATT_0_1"
+				(polyline
+					(pts
+						(xy -0.762 1.27) (xy 0 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 2.54) (xy 0.762 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 0) (xy 0 2.54)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "+BATT_1_1"
+				(pin power_in line
+					(at 0 0 90)
+					(length 0)
+					(name ""
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
 		(symbol "power:GND"
 			(power global)
 			(pin_names
@@ -3521,6 +3660,12 @@
 		(uuid "354c7f32-9fee-45bb-a072-fc061b33b2ac")
 	)
 	(junction
+		(at 26.67 120.65)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "56a05d9f-9ede-4e5d-82af-8ca45e4a6702")
+	)
+	(junction
 		(at 54.61 31.75)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -3531,12 +3676,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "809bcf96-a58a-49a8-8568-87603e522aed")
-	)
-	(junction
-		(at 26.67 120.65)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "82ab5397-3083-4f15-9002-c445beb637c5")
 	)
 	(junction
 		(at 128.27 147.32)
@@ -3563,6 +3702,12 @@
 		(uuid "9b92b454-6d00-4f98-8944-a3e296cf7f12")
 	)
 	(junction
+		(at 36.83 120.65)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "a53a5ed0-d8c3-4ad7-8256-8c9c021ddb53")
+	)
+	(junction
 		(at 54.61 59.69)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -3573,12 +3718,6 @@
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "c2640e2d-854b-4b1b-980f-a1799a7996a3")
-	)
-	(junction
-		(at 257.81 120.65)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "edc29d72-e345-49e1-aac0-eaf75b8f875a")
 	)
 	(no_connect
 		(at 207.01 53.34)
@@ -3718,6 +3857,16 @@
 	)
 	(wire
 		(pts
+			(xy 265.43 123.19) (xy 265.43 116.84)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "149a6b8b-0e0a-4330-9bfe-2d69e8c82f2d")
+	)
+	(wire
+		(pts
 			(xy 41.91 156.21) (xy 48.26 156.21)
 		)
 		(stroke
@@ -3778,7 +3927,7 @@
 	)
 	(wire
 		(pts
-			(xy 26.67 114.3) (xy 26.67 120.65)
+			(xy 36.83 114.3) (xy 36.83 120.65)
 		)
 		(stroke
 			(width 0)
@@ -4008,16 +4157,6 @@
 	)
 	(wire
 		(pts
-			(xy 257.81 120.65) (xy 257.81 123.19)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "6325f35d-1d18-48ed-845a-54ecd38c6cba")
-	)
-	(wire
-		(pts
 			(xy 124.46 110.49) (xy 124.46 113.03)
 		)
 		(stroke
@@ -4138,6 +4277,16 @@
 	)
 	(wire
 		(pts
+			(xy 26.67 114.3) (xy 26.67 120.65)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "951c3f7b-05da-40fa-a5e2-2b7462add33f")
+	)
+	(wire
+		(pts
 			(xy 46.99 125.73) (xy 46.99 120.65)
 		)
 		(stroke
@@ -4188,6 +4337,16 @@
 	)
 	(wire
 		(pts
+			(xy 36.83 120.65) (xy 26.67 120.65)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a7d972d9-d5ab-472a-9780-758feef2d6da")
+	)
+	(wire
+		(pts
 			(xy 62.23 34.29) (xy 74.93 34.29)
 		)
 		(stroke
@@ -4208,7 +4367,7 @@
 	)
 	(wire
 		(pts
-			(xy 257.81 123.19) (xy 247.65 123.19)
+			(xy 247.65 123.19) (xy 265.43 123.19)
 		)
 		(stroke
 			(width 0)
@@ -4288,6 +4447,16 @@
 	)
 	(wire
 		(pts
+			(xy 36.83 120.65) (xy 46.99 120.65)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cba521e6-bfd3-4531-bce6-d6cf251051c9")
+	)
+	(wire
+		(pts
 			(xy 72.39 133.35) (xy 72.39 120.65)
 		)
 		(stroke
@@ -4325,16 +4494,6 @@
 			(type default)
 		)
 		(uuid "d4bd6e34-383c-4f56-9d30-7238bd79a18c")
-	)
-	(wire
-		(pts
-			(xy 26.67 120.65) (xy 46.99 120.65)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "d6b876a5-761a-4da5-b2bd-124032f81550")
 	)
 	(wire
 		(pts
@@ -4494,30 +4653,6 @@
 			)
 		)
 	)
-	(global_label "V_{BAT}"
-		(shape input)
-		(at 154.94 45.72 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "33a127d5-2a9d-432c-bd3f-2b9d56d78d80")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 148.1544 45.72 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-	)
 	(global_label "SWDIO"
 		(shape input)
 		(at 248.92 128.27 0)
@@ -4614,7 +4749,7 @@
 			)
 		)
 	)
-	(global_label "PROBE_2_DIVIDER"
+	(global_label "PROBE_1_DIVIDER"
 		(shape input)
 		(at 154.94 35.56 180)
 		(fields_autoplaced yes)
@@ -4624,7 +4759,7 @@
 			)
 			(justify right)
 		)
-		(uuid "62c5a21f-c658-4e5a-b682-82bd3de8bb97")
+		(uuid "69ec04de-923a-4fdc-ba5a-ad0a3357908e")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 135.2634 35.56 0)
 			(hide yes)
@@ -4782,30 +4917,6 @@
 			)
 		)
 	)
-	(global_label "PROBE_1_DIVIDER"
-		(shape input)
-		(at 154.94 38.1 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "ac6f0dbb-9e3b-4fdb-8a68-c8caa900a888")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 135.2634 38.1 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-	)
 	(global_label "NRESET"
 		(shape input)
 		(at 248.92 130.81 0)
@@ -4843,6 +4954,30 @@
 		(uuid "ba94abef-1bbe-42cf-9d81-fece0d54590d")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 138.5292 33.02 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+	)
+	(global_label "PROBE_2_DIVIDER"
+		(shape input)
+		(at 154.94 38.1 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "be5d92fc-7553-4765-bcba-f1b39ed49fb4")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 135.2634 38.1 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4928,6 +5063,30 @@
 	)
 	(global_label "Enable-Battery"
 		(shape output)
+		(at 154.94 45.72 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "d8c95ad3-8360-43f2-942d-f901e587a9c9")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 137.3198 45.72 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+	)
+	(global_label "V_{BAT}"
+		(shape input)
 		(at 154.94 43.18 180)
 		(fields_autoplaced yes)
 		(effects
@@ -4936,9 +5095,9 @@
 			)
 			(justify right)
 		)
-		(uuid "d246fb29-cd76-43f6-8ec0-5e7b128e0c4d")
+		(uuid "d8eb69f6-6353-4bd6-911b-b4b45a17ce49")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 137.3198 43.18 0)
+			(at 148.1544 43.18 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5046,7 +5205,7 @@
 			(uuid "39a14efd-a7f1-4114-9e12-27d407fc258e")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "#PWR010")
 					(unit 1)
@@ -5127,7 +5286,7 @@
 			(uuid "50c7c5c5-63cb-4851-95da-75c0f7e76a76")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "Probe1")
 					(unit 1)
@@ -5205,7 +5364,7 @@
 			(uuid "10bee37f-139b-48e5-9112-c02193c368b2")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "#PWR07")
 					(unit 1)
@@ -5287,7 +5446,7 @@
 			(uuid "3349bd42-3051-4fec-b2df-6d1e386ccc5a")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "C5")
 					(unit 1)
@@ -5367,7 +5526,7 @@
 			(uuid "623dfc5d-9934-46f6-876e-474e26df6098")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "SW2")
 					(unit 1)
@@ -5445,7 +5604,7 @@
 			(uuid "ff2f4a9c-0d8f-44a5-bdc8-cacd648a52c6")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "#PWR02")
 					(unit 1)
@@ -5455,7 +5614,7 @@
 	)
 	(symbol
 		(lib_id "power:PWR_FLAG")
-		(at 26.67 114.3 0)
+		(at 36.83 114.3 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -5466,7 +5625,7 @@
 		(fields_autoplaced yes)
 		(uuid "3d4464a7-3404-4816-8ca0-e3f25d5c99c8")
 		(property "Reference" "#FLG0401"
-			(at 26.67 112.395 0)
+			(at 36.83 112.395 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5477,7 +5636,7 @@
 			)
 		)
 		(property "Value" "PWR_FLAG"
-			(at 26.67 109.22 0)
+			(at 36.83 109.22 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -5487,7 +5646,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 26.67 114.3 0)
+			(at 36.83 114.3 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5498,7 +5657,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 26.67 114.3 0)
+			(at 36.83 114.3 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5509,7 +5668,7 @@
 			)
 		)
 		(property "Description" "Special symbol for telling ERC where power comes from"
-			(at 26.67 114.3 0)
+			(at 36.83 114.3 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5523,7 +5682,7 @@
 			(uuid "84fc3ef2-7609-4cee-9f1f-1b9d6a1d334f")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "#FLG0401")
 					(unit 1)
@@ -5638,7 +5797,7 @@
 			(uuid "f0dc1ae9-da09-4e9f-9786-43766f5dccdb")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "BT1")
 					(unit 1)
@@ -5772,7 +5931,7 @@
 			(uuid "fd55eb32-9484-4109-8253-1e5c7f57b1cb")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "C1")
 					(unit 1)
@@ -5912,7 +6071,7 @@
 			(uuid "9e63f499-6b62-4a9c-b2cf-8ff41d1e9ff6")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "Q101")
 					(unit 1)
@@ -5991,7 +6150,7 @@
 			(uuid "ded794bc-218b-406c-9582-8bc53d71bb98")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "#PWR04")
 					(unit 1)
@@ -6071,7 +6230,7 @@
 			(uuid "16f254d6-2957-4cce-a0e8-77d1901d95ca")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "#PWR03")
 					(unit 1)
@@ -6153,7 +6312,7 @@
 			(uuid "697b39bd-d736-422e-96ab-333067ceda8d")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "R6")
 					(unit 1)
@@ -6244,7 +6403,7 @@
 			(uuid "ef3fc458-ee28-4134-8879-4f8f156cfff5")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "D1")
 					(unit 1)
@@ -6321,7 +6480,7 @@
 			(uuid "01c471d2-a955-4d28-82dc-49586874c17f")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "#PWR0112")
 					(unit 1)
@@ -6448,7 +6607,7 @@
 			(uuid "b37ce0ef-7073-4c5a-9519-ab1c364e0b51")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "C3")
 					(unit 1)
@@ -6606,87 +6765,9 @@
 			(uuid "6312a7a7-e000-44d1-9171-0cfb8e3af2fe")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "U1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:VDD")
-		(at 257.81 116.84 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "8561a1b8-e50f-479e-997a-04e1a51c82e0")
-		(property "Reference" "#PWR012"
-			(at 257.81 120.65 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "VDD"
-			(at 257.81 111.76 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 257.81 116.84 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 257.81 116.84 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"VDD\""
-			(at 257.81 116.84 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "bbe2b424-5ac1-4339-b01b-8b56d292650c")
-		)
-		(instances
-			(project "PCB"
-				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
-					(reference "#PWR012")
 					(unit 1)
 				)
 			)
@@ -6761,7 +6842,7 @@
 			(uuid "d809f2d0-7b5a-4d41-a62f-8261bf22be58")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "#PWR0109")
 					(unit 1)
@@ -6839,7 +6920,7 @@
 			(uuid "c99d3158-74b5-407c-8307-93d805cffd11")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "#PWR08")
 					(unit 1)
@@ -6919,7 +7000,7 @@
 			(uuid "10684acc-bcba-4211-9f32-425d8d6d936e")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "R2")
 					(unit 1)
@@ -6997,7 +7078,7 @@
 			(uuid "9e6cf090-3eb1-4f83-91b1-6ed8c4ad39cc")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "#PWR022")
 					(unit 1)
@@ -7124,7 +7205,7 @@
 			(uuid "02650211-7b20-45a7-b9f9-71a31a24d459")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "C6")
 					(unit 1)
@@ -7208,7 +7289,7 @@
 			(uuid "26e57777-ff1c-47b1-975e-9cc041e28d88")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "#PWR0110")
 					(unit 1)
@@ -7285,7 +7366,7 @@
 			(uuid "1ca71aaa-17fc-45c5-bdbd-80b6abc4b678")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "#PWR0116")
 					(unit 1)
@@ -7363,9 +7444,165 @@
 			(uuid "4e2a6484-c25e-42c2-99df-abafd274c944")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "#PWR05")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 26.67 114.3 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "ba9583a7-a539-4909-8510-41f080f60a25")
+		(property "Reference" "#PWR013"
+			(at 26.67 118.11 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+BATT"
+			(at 26.67 109.22 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 26.67 114.3 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 26.67 114.3 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 26.67 114.3 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "c2215341-1a82-4ad2-a5a0-a76bd7a96960")
+		)
+		(instances
+			(project "DualTemperatureSensorBattery"
+				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
+					(reference "#PWR013")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+BATT")
+		(at 257.81 116.84 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "bbbff3f9-e198-42b0-8590-ff4dd223c8ba")
+		(property "Reference" "#PWR015"
+			(at 257.81 120.65 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+BATT"
+			(at 257.81 111.76 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 257.81 116.84 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 257.81 116.84 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+BATT\""
+			(at 257.81 116.84 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "52dd9747-652c-4e7c-aa05-564f32cc36bd")
+		)
+		(instances
+			(project "DualTemperatureSensorBattery"
+				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
+					(reference "#PWR015")
 					(unit 1)
 				)
 			)
@@ -7440,7 +7677,7 @@
 			(uuid "861dac04-c5cf-4579-8e94-33b3eaf27ded")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "#PWR0108")
 					(unit 1)
@@ -7567,7 +7804,7 @@
 			(uuid "8f97a35f-5823-4d4c-b083-f4f7abf98bda")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "C2")
 					(unit 1)
@@ -7693,7 +7930,7 @@
 			(uuid "326f1201-1439-4efe-b60d-4fb3fec6540b")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "R4")
 					(unit 1)
@@ -7808,7 +8045,7 @@
 			(uuid "a1e9a1ab-3bc6-4487-99f6-95b7c542430d")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "R5")
 					(unit 1)
@@ -7887,9 +8124,87 @@
 			(uuid "93ff1379-0c5a-4ad3-a449-536eb11b69ed")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "#PWR01")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:VDD")
+		(at 265.43 116.84 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "d04690b1-e2ef-4b16-a27e-4faa14f8650b")
+		(property "Reference" "#PWR014"
+			(at 265.43 120.65 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "VDD"
+			(at 265.43 111.76 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 265.43 116.84 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 265.43 116.84 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"VDD\""
+			(at 265.43 116.84 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "a368ee02-c9d2-4bb8-8a7e-e488424fa0e2")
+		)
+		(instances
+			(project "DualTemperatureSensorBattery"
+				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
+					(reference "#PWR014")
 					(unit 1)
 				)
 			)
@@ -7965,7 +8280,7 @@
 			(uuid "d4b2de6e-a09c-48c6-b580-0cc62cea80e3")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "#PWR09")
 					(unit 1)
@@ -8057,7 +8372,7 @@
 			(uuid "f450e0d3-5c35-4973-8b9d-8337a9f0ab7e")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "J2")
 					(unit 1)
@@ -8139,7 +8454,7 @@
 			(uuid "6da4df08-7f5c-4495-ab9b-26868f33ae93")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "C4")
 					(unit 1)
@@ -8217,7 +8532,7 @@
 			(uuid "fafdc06d-20cb-49a6-ad47-0f7245538f87")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "#PWR024")
 					(unit 1)
@@ -8297,7 +8612,7 @@
 			(uuid "554a488d-604c-4342-90cc-06ec0450ed0c")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "R1")
 					(unit 1)
@@ -8376,7 +8691,7 @@
 			(uuid "091159fe-cf9d-4e9c-82e1-317458b5caac")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "#PWR06")
 					(unit 1)
@@ -8457,7 +8772,7 @@
 			(uuid "edc1cc2f-afc8-407b-be6a-d0af0ddcb3cb")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "Probe2")
 					(unit 1)
@@ -8535,7 +8850,7 @@
 			(uuid "73fced4e-c598-499d-9609-b8d1e8576b48")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "#PWR011")
 					(unit 1)
@@ -8615,7 +8930,7 @@
 			(uuid "24277b9b-6657-4fb8-a713-476c8620fb87")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "R3")
 					(unit 1)
@@ -8695,7 +9010,7 @@
 			(uuid "8b3052cc-5a93-43f8-a2a9-f0f62326833c")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "JP1")
 					(unit 1)
@@ -8773,7 +9088,7 @@
 			(uuid "7f9cec67-18c5-425e-95b0-4d5e868fea72")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "#PWR023")
 					(unit 1)
@@ -8855,7 +9170,7 @@
 			(uuid "766c692a-9326-4465-bd8c-d87a8cceb573")
 		)
 		(instances
-			(project "PCB"
+			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "Probe3")
 					(unit 1)
