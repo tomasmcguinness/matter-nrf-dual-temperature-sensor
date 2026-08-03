@@ -2815,320 +2815,6 @@
 			)
 			(embedded_fonts no)
 		)
-		(symbol "Transistor_FET:BSS84"
-			(pin_names
-				(hide yes)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(in_pos_files yes)
-			(duplicate_pin_numbers_are_jumpers no)
-			(property "Reference" "Q"
-				(at 5.08 1.905 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Value" "BSS84"
-				(at 5.08 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Footprint" "Package_TO_SOT_SMD:SOT-23"
-				(at 5.08 -1.905 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-						(italic yes)
-					)
-					(justify left)
-				)
-			)
-			(property "Datasheet" "http://assets.nexperia.com/documents/data-sheet/BSS84.pdf"
-				(at 5.08 -3.81 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(justify left)
-				)
-			)
-			(property "Description" "-0.13A Id, -50V Vds, P-Channel MOSFET, SOT-23"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_keywords" "P-Channel MOSFET"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "ki_fp_filters" "SOT?23*"
-				(at 0 0 0)
-				(show_name no)
-				(do_not_autoplace no)
-				(hide yes)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(symbol "BSS84_0_1"
-				(polyline
-					(pts
-						(xy 0.254 1.905) (xy 0.254 -1.905)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0.254 0) (xy -2.54 0)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0.762 2.286) (xy 0.762 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0.762 1.778) (xy 3.302 1.778) (xy 3.302 -1.778) (xy 0.762 -1.778)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0.762 0.508) (xy 0.762 -0.508)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0.762 -1.27) (xy 0.762 -2.286)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(circle
-					(center 1.651 0)
-					(radius 2.794)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.286 0) (xy 1.27 0.381) (xy 1.27 -0.381) (xy 2.286 0)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.54 2.54) (xy 2.54 1.778)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(circle
-					(center 2.54 1.778)
-					(radius 0.254)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-				(circle
-					(center 2.54 -1.778)
-					(radius 0.254)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type outline)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.54 -2.54) (xy 2.54 0) (xy 0.762 0)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 2.794 -0.508) (xy 2.921 -0.381) (xy 3.683 -0.381) (xy 3.81 -0.254)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 3.302 -0.381) (xy 2.921 0.254) (xy 3.683 0.254) (xy 3.302 -0.381)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "BSS84_1_1"
-				(pin input line
-					(at -5.08 0 0)
-					(length 2.54)
-					(name "G"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 2.54 -5.08 90)
-					(length 2.54)
-					(name "S"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 2.54 5.08 270)
-					(length 2.54)
-					(name "D"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "3"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)
 		(symbol "power:+BATT"
 			(power global)
 			(pin_numbers
@@ -3642,13 +3328,7 @@
 		(uuid "08b9b6c8-358f-499b-87f4-e299c6715501")
 	)
 	(junction
-		(at 138.43 147.32)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "18002010-7148-4410-8dec-ba1ae8a12651")
-	)
-	(junction
-		(at 59.69 120.65)
+		(at 64.77 101.6)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "26ee6f3d-da7e-47f2-b7f3-2cc5f2f8082c")
@@ -3660,7 +3340,7 @@
 		(uuid "354c7f32-9fee-45bb-a072-fc061b33b2ac")
 	)
 	(junction
-		(at 26.67 120.65)
+		(at 31.75 101.6)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "56a05d9f-9ede-4e5d-82af-8ca45e4a6702")
@@ -3678,31 +3358,19 @@
 		(uuid "809bcf96-a58a-49a8-8568-87603e522aed")
 	)
 	(junction
-		(at 128.27 147.32)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "84728d27-9442-4c0d-af94-9256a256ab27")
-	)
-	(junction
-		(at 124.46 125.73)
-		(diameter 0)
-		(color 0 0 0 0)
-		(uuid "8923beef-cde9-43e1-bd37-89835f22d0b1")
-	)
-	(junction
-		(at 72.39 120.65)
+		(at 77.47 101.6)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "8e5cee28-7461-4352-a12f-7e50cb206b77")
 	)
 	(junction
-		(at 46.99 120.65)
+		(at 52.07 101.6)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "9b92b454-6d00-4f98-8944-a3e296cf7f12")
 	)
 	(junction
-		(at 36.83 120.65)
+		(at 41.91 101.6)
 		(diameter 0)
 		(color 0 0 0 0)
 		(uuid "a53a5ed0-d8c3-4ad7-8256-8c9c021ddb53")
@@ -3722,6 +3390,10 @@
 	(no_connect
 		(at 207.01 53.34)
 		(uuid "0fc77331-5a84-452c-b74c-a0396728fa90")
+	)
+	(no_connect
+		(at 161.29 45.72)
+		(uuid "16568989-342b-4d8e-b1c0-76b116e2b154")
 	)
 	(no_connect
 		(at 207.01 38.1)
@@ -3772,6 +3444,10 @@
 		(uuid "e16fa681-d2e8-443d-ad8e-15f367517753")
 	)
 	(no_connect
+		(at 161.29 43.18)
+		(uuid "eedf09ac-440a-496b-ae2f-7aca4a0fed8d")
+	)
+	(no_connect
 		(at 207.01 55.88)
 		(uuid "fa721b31-cd58-4988-ada2-54097f21680f")
 	)
@@ -3797,7 +3473,7 @@
 	)
 	(wire
 		(pts
-			(xy 26.67 132.08) (xy 26.67 137.16)
+			(xy 31.75 113.03) (xy 31.75 118.11)
 		)
 		(stroke
 			(width 0)
@@ -3807,7 +3483,7 @@
 	)
 	(wire
 		(pts
-			(xy 46.99 120.65) (xy 59.69 120.65)
+			(xy 52.07 101.6) (xy 64.77 101.6)
 		)
 		(stroke
 			(width 0)
@@ -3927,23 +3603,13 @@
 	)
 	(wire
 		(pts
-			(xy 36.83 114.3) (xy 36.83 120.65)
+			(xy 41.91 95.25) (xy 41.91 101.6)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "2a909518-6b1b-4ff0-8484-0403d9b09995")
-	)
-	(wire
-		(pts
-			(xy 138.43 110.49) (xy 138.43 120.65)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "2d65b82e-9b44-4265-b1e0-522e2a33a4db")
 	)
 	(wire
 		(pts
@@ -3957,7 +3623,7 @@
 	)
 	(wire
 		(pts
-			(xy 64.77 133.35) (xy 59.69 133.35)
+			(xy 69.85 114.3) (xy 64.77 114.3)
 		)
 		(stroke
 			(width 0)
@@ -3967,33 +3633,13 @@
 	)
 	(wire
 		(pts
-			(xy 46.99 130.81) (xy 46.99 137.16)
+			(xy 52.07 111.76) (xy 52.07 118.11)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "34675d22-7da5-44ca-9189-99ae87138ee4")
-	)
-	(wire
-		(pts
-			(xy 128.27 147.32) (xy 138.43 147.32)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "386b41f9-f828-4199-b25c-f3ad30b695c9")
-	)
-	(wire
-		(pts
-			(xy 154.94 45.72) (xy 161.29 45.72)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "39030885-bc67-433f-a217-b4d4dee7911a")
 	)
 	(wire
 		(pts
@@ -4037,7 +3683,7 @@
 	)
 	(wire
 		(pts
-			(xy 78.74 120.65) (xy 78.74 114.3)
+			(xy 83.82 101.6) (xy 83.82 95.25)
 		)
 		(stroke
 			(width 0)
@@ -4127,16 +3773,6 @@
 	)
 	(wire
 		(pts
-			(xy 154.94 43.18) (xy 161.29 43.18)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "5c58793b-93d8-4f3a-909d-17a394207a67")
-	)
-	(wire
-		(pts
 			(xy 146.05 71.12) (xy 146.05 68.58)
 		)
 		(stroke
@@ -4144,36 +3780,6 @@
 			(type default)
 		)
 		(uuid "5ed99bf3-49b3-46ee-a200-fef6ed943e93")
-	)
-	(wire
-		(pts
-			(xy 114.3 147.32) (xy 128.27 147.32)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "61f8bd0a-f73c-4f8c-ac8d-6fd8d6ddfa86")
-	)
-	(wire
-		(pts
-			(xy 124.46 110.49) (xy 124.46 113.03)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "73db52a0-1d64-4110-8f2a-ce712fcd2e66")
-	)
-	(wire
-		(pts
-			(xy 138.43 165.1) (xy 138.43 160.02)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "77c587ab-b1ae-47fe-a2fb-4621022d0f6f")
 	)
 	(wire
 		(pts
@@ -4187,7 +3793,7 @@
 	)
 	(wire
 		(pts
-			(xy 71.12 120.65) (xy 72.39 120.65)
+			(xy 76.2 101.6) (xy 77.47 101.6)
 		)
 		(stroke
 			(width 0)
@@ -4237,16 +3843,6 @@
 	)
 	(wire
 		(pts
-			(xy 138.43 147.32) (xy 138.43 152.4)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "8c48a17a-ecfa-4d1c-a8e2-9e621db5c9f8")
-	)
-	(wire
-		(pts
 			(xy 49.53 59.69) (xy 49.53 58.42)
 		)
 		(stroke
@@ -4277,7 +3873,7 @@
 	)
 	(wire
 		(pts
-			(xy 26.67 114.3) (xy 26.67 120.65)
+			(xy 31.75 95.25) (xy 31.75 101.6)
 		)
 		(stroke
 			(width 0)
@@ -4287,7 +3883,7 @@
 	)
 	(wire
 		(pts
-			(xy 46.99 125.73) (xy 46.99 120.65)
+			(xy 52.07 106.68) (xy 52.07 101.6)
 		)
 		(stroke
 			(width 0)
@@ -4297,7 +3893,7 @@
 	)
 	(wire
 		(pts
-			(xy 59.69 120.65) (xy 60.96 120.65)
+			(xy 64.77 101.6) (xy 66.04 101.6)
 		)
 		(stroke
 			(width 0)
@@ -4327,7 +3923,7 @@
 	)
 	(wire
 		(pts
-			(xy 67.31 133.35) (xy 72.39 133.35)
+			(xy 72.39 114.3) (xy 77.47 114.3)
 		)
 		(stroke
 			(width 0)
@@ -4337,7 +3933,7 @@
 	)
 	(wire
 		(pts
-			(xy 36.83 120.65) (xy 26.67 120.65)
+			(xy 41.91 101.6) (xy 31.75 101.6)
 		)
 		(stroke
 			(width 0)
@@ -4377,26 +3973,6 @@
 	)
 	(wire
 		(pts
-			(xy 128.27 160.02) (xy 128.27 165.1)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "bbf1f806-0f97-40a7-93ab-76a71d80dba8")
-	)
-	(wire
-		(pts
-			(xy 128.27 147.32) (xy 128.27 152.4)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "bc2ef8ea-ec88-4839-9e02-774a209ea7ec")
-	)
-	(wire
-		(pts
 			(xy 74.93 62.23) (xy 62.23 62.23)
 		)
 		(stroke
@@ -4427,7 +4003,7 @@
 	)
 	(wire
 		(pts
-			(xy 26.67 120.65) (xy 26.67 124.46)
+			(xy 31.75 101.6) (xy 31.75 105.41)
 		)
 		(stroke
 			(width 0)
@@ -4447,7 +4023,7 @@
 	)
 	(wire
 		(pts
-			(xy 36.83 120.65) (xy 46.99 120.65)
+			(xy 41.91 101.6) (xy 52.07 101.6)
 		)
 		(stroke
 			(width 0)
@@ -4457,7 +4033,7 @@
 	)
 	(wire
 		(pts
-			(xy 72.39 133.35) (xy 72.39 120.65)
+			(xy 77.47 114.3) (xy 77.47 101.6)
 		)
 		(stroke
 			(width 0)
@@ -4497,16 +4073,6 @@
 	)
 	(wire
 		(pts
-			(xy 138.43 134.62) (xy 138.43 130.81)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "d7085dee-f783-4be9-95a4-7f022d7ef9be")
-	)
-	(wire
-		(pts
 			(xy 62.23 59.69) (xy 64.77 59.69)
 		)
 		(stroke
@@ -4517,7 +4083,7 @@
 	)
 	(wire
 		(pts
-			(xy 72.39 120.65) (xy 78.74 120.65)
+			(xy 77.47 101.6) (xy 83.82 101.6)
 		)
 		(stroke
 			(width 0)
@@ -4527,33 +4093,13 @@
 	)
 	(wire
 		(pts
-			(xy 138.43 142.24) (xy 138.43 147.32)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "e0cfe1a4-88db-4a65-8406-3beb016642db")
-	)
-	(wire
-		(pts
-			(xy 59.69 133.35) (xy 59.69 120.65)
+			(xy 64.77 114.3) (xy 64.77 101.6)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
 		(uuid "e42af5d6-eadc-4c18-a87e-20522f4faa5c")
-	)
-	(wire
-		(pts
-			(xy 124.46 125.73) (xy 130.81 125.73)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "e49b6822-0420-41bc-ae2c-8cc0645778d2")
 	)
 	(wire
 		(pts
@@ -4567,16 +4113,6 @@
 	)
 	(wire
 		(pts
-			(xy 124.46 120.65) (xy 124.46 125.73)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f174ca39-ded8-41ac-80a9-b18e2beefe5c")
-	)
-	(wire
-		(pts
 			(xy 229.87 82.55) (xy 229.87 86.36)
 		)
 		(stroke
@@ -4584,16 +4120,6 @@
 			(type default)
 		)
 		(uuid "f64161a7-dcaf-46fa-a9fe-24ef7aea0178")
-	)
-	(wire
-		(pts
-			(xy 114.3 125.73) (xy 124.46 125.73)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f8621628-8b80-491e-b779-958b4eb76c2b")
 	)
 	(wire
 		(pts
@@ -5013,102 +4539,6 @@
 			)
 		)
 	)
-	(global_label "Enable-Battery"
-		(shape input)
-		(at 114.3 125.73 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "cc15ab08-b40d-49bf-8716-64de5dcd03b8")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 96.6798 125.73 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-	)
-	(global_label "V_{BAT}"
-		(shape output)
-		(at 114.3 147.32 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "cfde764e-e44b-48c8-93d0-ba2d20d1d900")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 107.5144 147.32 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-	)
-	(global_label "Enable-Battery"
-		(shape output)
-		(at 154.94 45.72 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "d8c95ad3-8360-43f2-942d-f901e587a9c9")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 137.3198 45.72 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-	)
-	(global_label "V_{BAT}"
-		(shape input)
-		(at 154.94 43.18 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "d8eb69f6-6353-4bd6-911b-b4b45a17ce49")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 148.1544 43.18 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-	)
 	(global_label "LED"
 		(shape input)
 		(at 41.91 156.21 180)
@@ -5224,7 +4654,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "11e66c5e-3b53-4071-8080-15bdb3407736")
-		(property "Reference" "Probe1"
+		(property "Reference" "P2"
 			(at 43.18 51.816 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5288,7 +4718,7 @@
 		(instances
 			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
-					(reference "Probe1")
+					(reference "P2")
 					(unit 1)
 				)
 			)
@@ -5296,7 +4726,7 @@
 	)
 	(symbol
 		(lib_id "power:VDD")
-		(at 78.74 114.3 0)
+		(at 83.82 95.25 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -5307,7 +4737,7 @@
 		(fields_autoplaced yes)
 		(uuid "167fd9ef-63eb-4b15-a015-0285282e797f")
 		(property "Reference" "#PWR07"
-			(at 78.74 118.11 0)
+			(at 83.82 99.06 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5318,7 +4748,7 @@
 			)
 		)
 		(property "Value" "VDD"
-			(at 78.74 109.22 0)
+			(at 83.82 90.17 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -5328,7 +4758,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 78.74 114.3 0)
+			(at 83.82 95.25 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5339,7 +4769,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 78.74 114.3 0)
+			(at 83.82 95.25 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5350,7 +4780,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"VDD\""
-			(at 78.74 114.3 0)
+			(at 83.82 95.25 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5466,7 +4896,7 @@
 		(dnp no)
 		(fields_autoplaced yes)
 		(uuid "1bbe6375-28ab-4062-ae2d-06dfce4fe87d")
-		(property "Reference" "SW2"
+		(property "Reference" "SW1"
 			(at 240.03 78.74 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5528,7 +4958,7 @@
 		(instances
 			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
-					(reference "SW2")
+					(reference "SW1")
 					(unit 1)
 				)
 			)
@@ -5614,7 +5044,7 @@
 	)
 	(symbol
 		(lib_id "power:PWR_FLAG")
-		(at 36.83 114.3 0)
+		(at 41.91 95.25 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -5625,7 +5055,7 @@
 		(fields_autoplaced yes)
 		(uuid "3d4464a7-3404-4816-8ca0-e3f25d5c99c8")
 		(property "Reference" "#FLG0401"
-			(at 36.83 112.395 0)
+			(at 41.91 93.345 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5636,7 +5066,7 @@
 			)
 		)
 		(property "Value" "PWR_FLAG"
-			(at 36.83 109.22 0)
+			(at 41.91 90.17 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -5646,7 +5076,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 36.83 114.3 0)
+			(at 41.91 95.25 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5657,7 +5087,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 36.83 114.3 0)
+			(at 41.91 95.25 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5668,7 +5098,7 @@
 			)
 		)
 		(property "Description" "Special symbol for telling ERC where power comes from"
-			(at 36.83 114.3 0)
+			(at 41.91 95.25 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5692,7 +5122,7 @@
 	)
 	(symbol
 		(lib_id "Device:Battery_Cell")
-		(at 26.67 129.54 0)
+		(at 31.75 110.49 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -5703,7 +5133,7 @@
 		(fields_autoplaced yes)
 		(uuid "3e3c8bac-90de-4a0a-b69c-c35019303d1e")
 		(property "Reference" "BT1"
-			(at 30.48 126.4284 0)
+			(at 35.56 107.3784 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -5714,7 +5144,7 @@
 			)
 		)
 		(property "Value" "Battery_Cell"
-			(at 30.48 128.9684 0)
+			(at 35.56 109.9184 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -5725,7 +5155,7 @@
 			)
 		)
 		(property "Footprint" "Battery:BatteryHolder_Keystone_3034_1x20mm"
-			(at 26.67 128.016 90)
+			(at 31.75 108.966 90)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5736,7 +5166,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 26.67 128.016 90)
+			(at 31.75 108.966 90)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5747,7 +5177,7 @@
 			)
 		)
 		(property "Description" "Single-cell battery"
-			(at 26.67 129.54 0)
+			(at 31.75 110.49 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5758,7 +5188,7 @@
 			)
 		)
 		(property "Sim.Device" "V"
-			(at 26.67 129.54 0)
+			(at 31.75 110.49 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5769,7 +5199,7 @@
 			)
 		)
 		(property "Sim.Type" "DC"
-			(at 26.67 129.54 0)
+			(at 31.75 110.49 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5780,7 +5210,7 @@
 			)
 		)
 		(property "Sim.Pins" "1=+ 2=-"
-			(at 26.67 129.54 0)
+			(at 31.75 110.49 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -5947,142 +5377,9 @@
 		)
 	)
 	(symbol
-		(lib_id "Transistor_FET:BSS84")
-		(at 135.89 125.73 0)
-		(mirror x)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "45bb76b6-5c68-4ede-9dfc-542334d849e4")
-		(property "Reference" "Q101"
-			(at 142.24 124.46 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "BSS84"
-			(at 142.24 127 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Package_TO_SOT_SMD:SOT-23-3"
-			(at 140.97 123.825 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-					(italic yes)
-				)
-				(justify left)
-			)
-		)
-		(property "Datasheet" "https://www.mouser.de/datasheet/2/308/1/BSS84_D-2310226.pdf"
-			(at 135.89 125.73 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Description" "-0.13A Id, -50V Vds, P-Channel MOSFET, SOT-23"
-			(at 135.89 125.73 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "manf" "onsemi / Fairchild"
-			(at 135.89 125.73 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "manf#" "BSS84"
-			(at 135.89 125.73 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "mouser#" "512-BSS84"
-			(at 135.89 125.73 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "CONFIG" ""
-			(at 135.89 125.73 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "d1ef2f24-014a-41fa-967d-58f3924d723b")
-		)
-		(pin "2"
-			(uuid "0cb00ca0-ca9e-4eea-994f-644cff430d0b")
-		)
-		(pin "3"
-			(uuid "9e63f499-6b62-4a9c-b2cf-8ff41d1e9ff6")
-		)
-		(instances
-			(project "DualTemperatureSensorBattery"
-				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
-					(reference "Q101")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_name "GND_6")
 		(lib_id "power:GND")
-		(at 26.67 137.16 0)
+		(at 31.75 118.11 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -6093,7 +5390,7 @@
 		(fields_autoplaced yes)
 		(uuid "46f621e8-a38f-4caf-a727-da404717a284")
 		(property "Reference" "#PWR04"
-			(at 26.67 143.51 0)
+			(at 31.75 124.46 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6104,7 +5401,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 26.67 142.24 0)
+			(at 31.75 123.19 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -6114,7 +5411,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 26.67 137.16 0)
+			(at 31.75 118.11 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6125,7 +5422,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 26.67 137.16 0)
+			(at 31.75 118.11 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6136,7 +5433,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 26.67 137.16 0)
+			(at 31.75 118.11 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -6239,88 +5536,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R")
-		(at 124.46 116.84 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "4ebe9c75-98ad-4862-b57a-cbf04da482aa")
-		(property "Reference" "R6"
-			(at 127 115.5699 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "1M"
-			(at 127 118.1099 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
-			(at 122.682 116.84 90)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 124.46 116.84 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Resistor"
-			(at 124.46 116.84 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "2"
-			(uuid "a0528091-a017-454b-a1e1-0e1e3526f99b")
-		)
-		(pin "1"
-			(uuid "697b39bd-d736-422e-96ab-333067ceda8d")
-		)
-		(instances
-			(project "DualTemperatureSensorBattery"
-				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
-					(reference "R6")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:LED")
 		(at 63.5 156.21 180)
 		(unit 1)
@@ -6406,210 +5621,6 @@
 			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "D1")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 128.27 165.1 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "6b5f7912-7998-480a-817b-fb9189ad9854")
-		(property "Reference" "#PWR0112"
-			(at 128.27 171.45 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GND"
-			(at 128.397 169.4942 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 128.27 165.1 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 128.27 165.1 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 128.27 165.1 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "01c471d2-a955-4d28-82dc-49586874c17f")
-		)
-		(instances
-			(project "DualTemperatureSensorBattery"
-				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
-					(reference "#PWR0112")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:C")
-		(at 128.27 156.21 0)
-		(mirror y)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "780a2463-46f2-4f64-9dd4-af447d1fb854")
-		(property "Reference" "C3"
-			(at 132.08 154.9399 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Value" "1n"
-			(at 132.08 157.4799 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
-			(at 127.3048 160.02 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" "https://search.murata.co.jp/Ceramy/image/img/A01X/G101/ENG/GCM1555C2A102JE02-01A.pdf"
-			(at 128.27 156.21 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Unpolarized capacitor"
-			(at 128.27 156.21 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "manf" "Murata Electronics"
-			(at 128.27 156.21 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "manf#" "GCM1555C2A102JE02D"
-			(at 128.27 156.21 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "mouser#" "81-GCM1555C2A102JE02D"
-			(at 128.27 156.21 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "CONFIG" ""
-			(at 128.27 156.21 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "17568299-3fa0-4a83-b5fc-134b68c0ed98")
-		)
-		(pin "2"
-			(uuid "b37ce0ef-7073-4c5a-9519-ab1c364e0b51")
-		)
-		(instances
-			(project "DualTemperatureSensorBattery"
-				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
-					(reference "C3")
 					(unit 1)
 				)
 			)
@@ -6851,84 +5862,6 @@
 		)
 	)
 	(symbol
-		(lib_id "power:VDD")
-		(at 124.46 110.49 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "8f382d76-c824-4ff7-8eda-8198f7248650")
-		(property "Reference" "#PWR08"
-			(at 124.46 114.3 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "VDD"
-			(at 124.46 105.41 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 124.46 110.49 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 124.46 110.49 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"VDD\""
-			(at 124.46 110.49 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "c99d3158-74b5-407c-8307-93d805cffd11")
-		)
-		(instances
-			(project "DualTemperatureSensorBattery"
-				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
-					(reference "#PWR08")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:R")
 		(at 68.58 31.75 270)
 		(unit 1)
@@ -7088,7 +6021,7 @@
 	)
 	(symbol
 		(lib_id "Device:C_Small")
-		(at 46.99 128.27 0)
+		(at 52.07 109.22 0)
 		(mirror y)
 		(unit 1)
 		(body_style 1)
@@ -7100,7 +6033,7 @@
 		(fields_autoplaced yes)
 		(uuid "a1951b51-48c7-41c0-80f9-b8f94a8d85d3")
 		(property "Reference" "C6"
-			(at 49.53 127.0062 0)
+			(at 54.61 107.9562 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -7111,7 +6044,7 @@
 			)
 		)
 		(property "Value" "47u"
-			(at 49.53 129.5462 0)
+			(at 54.61 110.4962 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -7122,7 +6055,7 @@
 			)
 		)
 		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
-			(at 46.99 128.27 0)
+			(at 52.07 109.22 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7133,7 +6066,7 @@
 			)
 		)
 		(property "Datasheet" "https://www.mouser.de/datasheet/2/40/KGM_X7R-3223212.pdf"
-			(at 46.99 128.27 0)
+			(at 52.07 109.22 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7144,7 +6077,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 46.99 128.27 0)
+			(at 52.07 109.22 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7155,7 +6088,7 @@
 			)
 		)
 		(property "manf" "KYOCERA AVX"
-			(at 46.99 128.27 0)
+			(at 52.07 109.22 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7166,7 +6099,7 @@
 			)
 		)
 		(property "manf#" "04025C104KAT4A"
-			(at 46.99 128.27 0)
+			(at 52.07 109.22 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7177,7 +6110,7 @@
 			)
 		)
 		(property "CONFIG" ""
-			(at 46.99 128.27 0)
+			(at 52.07 109.22 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7188,7 +6121,7 @@
 			)
 		)
 		(property "mouser#" "581-04025C104KAT4A"
-			(at 46.99 128.27 0)
+			(at 52.07 109.22 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7222,7 +6155,7 @@
 	)
 	(symbol
 		(lib_id "power:GND")
-		(at 46.99 137.16 0)
+		(at 52.07 118.11 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -7232,7 +6165,7 @@
 		(dnp no)
 		(uuid "a9a39d56-f414-4ce4-a539-a448c8d3cb69")
 		(property "Reference" "#PWR0110"
-			(at 46.99 143.51 0)
+			(at 52.07 124.46 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7243,7 +6176,7 @@
 			)
 		)
 		(property "Value" "GND"
-			(at 46.99 142.24 0)
+			(at 52.07 123.19 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -7253,7 +6186,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 46.99 137.16 0)
+			(at 52.07 118.11 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7264,7 +6197,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 46.99 137.16 0)
+			(at 52.07 118.11 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7275,7 +6208,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 46.99 137.16 0)
+			(at 52.07 118.11 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7292,83 +6225,6 @@
 			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "#PWR0110")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:GND")
-		(at 138.43 165.1 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(uuid "b57081e5-8b34-462e-9c85-3993b74dccca")
-		(property "Reference" "#PWR0116"
-			(at 138.43 171.45 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "GND"
-			(at 138.557 169.4942 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 138.43 165.1 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 138.43 165.1 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-			(at 138.43 165.1 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "1ca71aaa-17fc-45c5-bdbd-80b6abc4b678")
-		)
-		(instances
-			(project "DualTemperatureSensorBattery"
-				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
-					(reference "#PWR0116")
 					(unit 1)
 				)
 			)
@@ -7454,7 +6310,7 @@
 	)
 	(symbol
 		(lib_id "power:+BATT")
-		(at 26.67 114.3 0)
+		(at 31.75 95.25 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -7465,7 +6321,7 @@
 		(fields_autoplaced yes)
 		(uuid "ba9583a7-a539-4909-8510-41f080f60a25")
 		(property "Reference" "#PWR013"
-			(at 26.67 118.11 0)
+			(at 31.75 99.06 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7476,7 +6332,7 @@
 			)
 		)
 		(property "Value" "+BATT"
-			(at 26.67 109.22 0)
+			(at 31.75 90.17 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -7486,7 +6342,7 @@
 			)
 		)
 		(property "Footprint" ""
-			(at 26.67 114.3 0)
+			(at 31.75 95.25 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7497,7 +6353,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 26.67 114.3 0)
+			(at 31.75 95.25 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7508,7 +6364,7 @@
 			)
 		)
 		(property "Description" "Power symbol creates a global label with name \"+BATT\""
-			(at 26.67 114.3 0)
+			(at 31.75 95.25 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -7813,247 +6669,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:R")
-		(at 138.43 138.43 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "c7975ab7-39ad-4153-85c6-be3141b15df6")
-		(property "Reference" "R4"
-			(at 140.97 137.1599 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "8k2"
-			(at 140.97 139.6999 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
-			(at 136.652 138.43 90)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" "https://www.mouser.de/datasheet/2/447/PYu_RT_1_to_0_01_RoHS_L_15-3461507.pdf"
-			(at 138.43 138.43 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Resistor 62.5 mW 0.1%"
-			(at 138.43 138.43 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "manf" "Yageo"
-			(at 138.43 138.43 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "manf#" "RT0402BRD078K2L"
-			(at 138.43 138.43 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "mouser#" "603-RT0402BRD078K2L"
-			(at 138.43 138.43 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "CONFIG" ""
-			(at 138.43 138.43 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "31bb5cf3-8e68-4967-8ae7-ac7ed6e0de61")
-		)
-		(pin "2"
-			(uuid "326f1201-1439-4efe-b60d-4fb3fec6540b")
-		)
-		(instances
-			(project "DualTemperatureSensorBattery"
-				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
-					(reference "R4")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "Device:R")
-		(at 138.43 156.21 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "c8c0a1a6-1a48-425d-8915-a535e22a4cee")
-		(property "Reference" "R5"
-			(at 140.97 154.9399 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" "2k2"
-			(at 140.97 157.4799 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Resistor_SMD:R_0805_2012Metric"
-			(at 136.652 156.21 90)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" "https://www.mouser.de/datasheet/2/447/PYu_RT_1_to_0_01_RoHS_L_15-3461507.pdf"
-			(at 138.43 156.21 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Resistor 62.5 mW 0.1"
-			(at 138.43 156.21 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "manf" "YAGEO"
-			(at 138.43 156.21 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "manf#" "RT0402BRD072K2L"
-			(at 138.43 156.21 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "mouser#" "603-RT0402BRD072K2L"
-			(at 138.43 156.21 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "524b5578-d608-4c4d-bd53-dc92761d632e")
-		)
-		(pin "2"
-			(uuid "a1e9a1ab-3bc6-4487-99f6-95b7c542430d")
-		)
-		(instances
-			(project "DualTemperatureSensorBattery"
-				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
-					(reference "R5")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_name "GND_1")
 		(lib_id "power:GND")
 		(at 72.39 160.02 0)
@@ -8205,84 +6820,6 @@
 			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
 					(reference "#PWR014")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
-		(lib_id "power:VDD")
-		(at 138.43 110.49 0)
-		(unit 1)
-		(body_style 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(in_pos_files yes)
-		(dnp no)
-		(fields_autoplaced yes)
-		(uuid "d770b3d6-f82a-4cd0-9fdc-c00d76342af7")
-		(property "Reference" "#PWR09"
-			(at 138.43 114.3 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Value" "VDD"
-			(at 138.43 105.41 0)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Footprint" ""
-			(at 138.43 110.49 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Datasheet" ""
-			(at 138.43 110.49 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(property "Description" "Power symbol creates a global label with name \"VDD\""
-			(at 138.43 110.49 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-			)
-		)
-		(pin "1"
-			(uuid "d4b2de6e-a09c-48c6-b580-0cc62cea80e3")
-		)
-		(instances
-			(project "DualTemperatureSensorBattery"
-				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
-					(reference "#PWR09")
 					(unit 1)
 				)
 			)
@@ -8710,7 +7247,7 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "e2db061e-e358-4d31-b2e6-ee5cecd5d50a")
-		(property "Reference" "Probe2"
+		(property "Reference" "P1"
 			(at 42.926 25.908 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8774,7 +7311,7 @@
 		(instances
 			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
-					(reference "Probe2")
+					(reference "P1")
 					(unit 1)
 				)
 			)
@@ -8880,7 +7417,7 @@
 				)
 			)
 		)
-		(property "Value" "220"
+		(property "Value" "330"
 			(at 52.07 152.4 90)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8940,7 +7477,7 @@
 	)
 	(symbol
 		(lib_id "Jumper:SolderJumper_2_Open")
-		(at 66.04 120.65 0)
+		(at 71.12 101.6 0)
 		(unit 1)
 		(body_style 1)
 		(exclude_from_sim no)
@@ -8951,7 +7488,7 @@
 		(fields_autoplaced yes)
 		(uuid "f1f44b15-b35b-4c17-9295-a0714b26df84")
 		(property "Reference" "JP1"
-			(at 66.04 114.3 0)
+			(at 71.12 95.25 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -8961,7 +7498,7 @@
 			)
 		)
 		(property "Value" "SolderJumper_2_Open"
-			(at 66.04 116.84 0)
+			(at 71.12 97.79 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -8971,7 +7508,7 @@
 			)
 		)
 		(property "Footprint" "Jumper:SolderJumper-2_P1.3mm_Open_RoundedPad1.0x1.5mm"
-			(at 66.04 120.65 0)
+			(at 71.12 101.6 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8982,7 +7519,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 66.04 128.27 0)
+			(at 71.12 109.22 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -8993,7 +7530,7 @@
 			)
 		)
 		(property "Description" "Solder Jumper, 2-pole, open"
-			(at 66.04 125.73 0)
+			(at 71.12 106.68 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9098,7 +7635,7 @@
 	)
 	(symbol
 		(lib_id "Connector_Generic:Conn_01x02")
-		(at 64.77 138.43 90)
+		(at 69.85 119.38 90)
 		(mirror x)
 		(unit 1)
 		(body_style 1)
@@ -9108,8 +7645,8 @@
 		(in_pos_files yes)
 		(dnp no)
 		(uuid "f9b62b2c-dd1e-4764-ad0c-e45d881cf805")
-		(property "Reference" "Probe3"
-			(at 81.788 140.716 90)
+		(property "Reference" "P3"
+			(at 86.868 121.666 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -9120,7 +7657,7 @@
 			)
 		)
 		(property "Value" "Conn_01x02"
-			(at 81.788 138.176 90)
+			(at 86.868 119.126 90)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -9131,7 +7668,7 @@
 			)
 		)
 		(property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_2x01_P2.54mm_Vertical"
-			(at 64.77 138.43 0)
+			(at 69.85 119.38 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9142,7 +7679,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 64.77 138.43 0)
+			(at 69.85 119.38 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9153,7 +7690,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 64.77 138.43 0)
+			(at 69.85 119.38 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -9172,7 +7709,7 @@
 		(instances
 			(project "DualTemperatureSensorBattery"
 				(path "/9240e15d-484a-49b3-8f80-37d1a010783e"
-					(reference "Probe3")
+					(reference "P3")
 					(unit 1)
 				)
 			)
