@@ -45,7 +45,8 @@
 	};
 
 	zephyr,user {
-		io-channels = <&adc 0>, <&adc 1>;
+		io-channels = <&adc 0>, <&adc 1>, <&adc 2>;
+		io-channel-names = "probe_1", "probe_2", "battery";
 	};
 };
 
@@ -70,6 +71,24 @@
 		zephyr,reference = "ADC_REF_INTERNAL";
 		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
 		zephyr,input-positive = <NRF_SAADC_AIN4>;
+		zephyr,resolution = <12>;
+		zephyr,oversampling = <8>;
+	};
+
+	/* Battery voltage. The coin cell drives VDD directly - there is no LDO and
+	 * no divider on this board - so the SAADC internal VDD input gives the cell
+	 * voltage with no extra hardware and no quiescent draw.
+	 *
+	 * The nRF54L internal reference is 900 mV, so gain 1/4 puts full scale at
+	 * 3.6 V. Note the nRF54L15 has no 1/6 gain (only 2, 1, 2/3, 2/4, 2/5, 2/6,
+	 * 2/7, 2/8), so ADC_GAIN_1_6 would fail channel setup with -EINVAL.
+	 */
+	channel@2 {
+		reg = <2>;
+		zephyr,gain = "ADC_GAIN_1_4";
+		zephyr,reference = "ADC_REF_INTERNAL";
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,input-positive = <NRF_SAADC_VDD>;
 		zephyr,resolution = <12>;
 		zephyr,oversampling = <8>;
 	};

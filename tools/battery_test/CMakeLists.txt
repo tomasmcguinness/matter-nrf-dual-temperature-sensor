@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.20.0)
 
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
-project(dual-temperature-sensor)
+project(battery-test)
 
 # Enable GNU STD support.
 include(${ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR}/config/nrfconnect/app/enable-gnu-std.cmake)
@@ -29,7 +29,6 @@ target_sources(app PRIVATE
     src/app_task.cpp
     src/battery.cpp
     src/main.cpp
-    src/DeviceInfoProviderImpl.cpp
 )
 
 ncs_configure_data_model()

@@ -1,2 +1,3 @@
 build/
 Hardware/~PCB.kicad_sch.lck
+tools/*/build/

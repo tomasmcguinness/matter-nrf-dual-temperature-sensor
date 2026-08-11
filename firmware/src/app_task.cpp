@@ -23,6 +23,7 @@
 #include <math.h>
 
 #include "DeviceInfoProviderImpl.h"
+#include "battery.h"
 
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -37,6 +38,7 @@ using namespace ::chip::DeviceLayer;
 
 k_timer sIndicatorTimer;
 k_timer sSensorTimer;
+k_timer sBatteryTimer;
 k_timer sFactoryResetTimer;
 bool mIndicatorState;
 
@@ -46,6 +48,12 @@ bool mIndicatorState;
 
 #define SENSOR_READ_INTERVAL 5000
 
+// A coin cell's voltage moves over months, so a daily sample is ample resolution.
+// The reading taken at start up covers cell replacement, which power cycles the
+// device anyway.
+//
+#define BATTERY_READ_INTERVAL_HOURS 24
+
 // TODO Move this to configuration (Maybe even Matter?), so they can be easily changed.
 //
 #define THERMISTORNOMINAL 10000
@@ -53,10 +61,25 @@ bool mIndicatorState;
 #define BCOEFFICIENT 3977
 #define SERIESRESISTOR 10000
 
-#define DT_SPEC_AND_COMMA(node_id, prop, idx) ADC_DT_SPEC_GET_BY_IDX(node_id, idx),
+// CR2032 operating window. The nRF54L15 itself runs well below 2.0V, but a coin
+// cell's usable capacity is gone by then, so that is where 0% sits.
+//
+constexpr uint16_t kMinOperatingVoltageMv = 2000;
+constexpr uint16_t kMaxOperatingVoltageMv = 3000;
+constexpr uint16_t kWarningVoltageMv = 2400;
+constexpr uint16_t kCriticalVoltageMv = 2200;
 
+// Matter reports BatPercentRemaining in half percent units, so 200 == 100%.
+//
+constexpr uint8_t kMaxBatteryPercentage = 200;
+
+// The battery channel is deliberately left out of this array. It is owned by
+// battery.cpp, which picks it out of zephyr,user by name.
+//
 static const struct adc_dt_spec adc_channels[] = {
-	DT_FOREACH_PROP_ELEM(DT_PATH(zephyr_user), io_channels, DT_SPEC_AND_COMMA)};
+	ADC_DT_SPEC_GET_BY_NAME(DT_PATH(zephyr_user), probe_1),
+	ADC_DT_SPEC_GET_BY_NAME(DT_PATH(zephyr_user), probe_2),
+};
 
 #define PROBE_1_DIVIDER_POWER_NODE DT_NODELABEL(probe_1_divider_power)
 #define PROBE_2_DIVIDER_POWER_NODE DT_NODELABEL(probe_2_divider_power)
@@ -71,6 +94,7 @@ static const struct gpio_dt_spec indicator_led = GPIO_DT_SPEC_GET(INDICATOR_LED_
 static const struct gpio_dt_spec reset_button = GPIO_DT_SPEC_GET(RESET_BUTTON_NODE, gpios);
 
 constexpr EndpointId kLightEndpointId = 0;
+constexpr EndpointId kPowerSourceEndpointId = 0;
 
 Identify sIdentify = {kLightEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator};
 
@@ -96,6 +120,14 @@ void AppTask::SensorTimerCallback(k_timer *timer)
 {
 	Nrf::PostTask([]
 				  { AppTask::SensorMeasureHandler(); });
+}
+
+/// @brief This callback is called when the battery timer expires. It will post a task to read the battery voltage.
+/// @param timer
+void AppTask::BatteryTimerCallback(k_timer *timer)
+{
+	Nrf::PostTask([]
+				  { AppTask::BatteryMeasureHandler(); });
 }
 
 void AppTask::IndicatorTimerCallback(k_timer *timer)
@@ -187,6 +219,9 @@ CHIP_ERROR AppTask::Init()
 	k_timer_init(&sSensorTimer, &SensorTimerCallback, nullptr);
 	k_timer_user_data_set(&sSensorTimer, this);
 
+	k_timer_init(&sBatteryTimer, &BatteryTimerCallback, nullptr);
+	k_timer_user_data_set(&sBatteryTimer, this);
+
 	k_timer_init(&sFactoryResetTimer, &FactoryResetTimerCallback, nullptr);
 	k_timer_user_data_set(&sFactoryResetTimer, this);
 
@@ -196,6 +231,13 @@ CHIP_ERROR AppTask::Init()
 CHIP_ERROR AppTask::StartApp()
 {
 	ReturnErrorOnFailure(Init());
+
+	// Started here, after StartServer(), so the first measurement cannot land
+	// before the PowerSource cluster exists. Unlike the sensor timer this is not
+	// held back until the device is provisioned - the battery level should be
+	// populated before a controller first reads it during commissioning.
+	//
+	k_timer_start(&sBatteryTimer, K_MSEC(1000), K_HOURS(BATTERY_READ_INTERVAL_HOURS));
 
 	while (true)
 	{
@@ -282,6 +324,8 @@ void AppTask::ConfigureGPIO()
 
 		LOG_INF("Successfully setup ADC channel #%d", i);
 	}
+
+	BatteryMeasurementInit();
 
 	if (!gpio_is_ready_dt(&indicator_led))
 	{
@@ -422,23 +466,71 @@ void AppTask::SensorMeasureHandler()
 	chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(2, probe_2_temperature);
 }
 
+void AppTask::BatteryMeasureHandler()
+{
+	int32_t voltageMv = BatteryMeasurementReadVoltageMv();
+
+	if (voltageMv < 0)
+	{
+		LOG_ERR("Battery measurement failed (%" PRId32 ")", voltageMv);
+
+		Clusters::PowerSource::Attributes::Status::Set(kPowerSourceEndpointId, Clusters::PowerSource::PowerSourceStatusEnum::kUnavailable);
+		Clusters::PowerSource::Attributes::BatPresent::Set(kPowerSourceEndpointId, false);
+		return;
+	}
+
+	uint8_t percentage;
+
+	if (voltageMv <= kMinOperatingVoltageMv)
+	{
+		percentage = 0;
+	}
+	else if (voltageMv >= kMaxOperatingVoltageMv)
+	{
+		percentage = kMaxBatteryPercentage;
+	}
+	else
+	{
+		percentage = static_cast<uint8_t>(kMaxBatteryPercentage * (voltageMv - kMinOperatingVoltageMv) / (kMaxOperatingVoltageMv - kMinOperatingVoltageMv));
+	}
+
+	Clusters::PowerSource::BatChargeLevelEnum chargeLevel;
+
+	if (voltageMv < kCriticalVoltageMv)
+	{
+		chargeLevel = Clusters::PowerSource::BatChargeLevelEnum::kCritical;
+	}
+	else if (voltageMv < kWarningVoltageMv)
+	{
+		chargeLevel = Clusters::PowerSource::BatChargeLevelEnum::kWarning;
+	}
+	else
+	{
+		chargeLevel = Clusters::PowerSource::BatChargeLevelEnum::kOk;
+	}
+
+	LOG_INF("Battery: %" PRId32 " mV, %u%% (level %u)", voltageMv, percentage / 2, static_cast<uint8_t>(chargeLevel));
+
+	Clusters::PowerSource::Attributes::Status::Set(kPowerSourceEndpointId, Clusters::PowerSource::PowerSourceStatusEnum::kActive);
+	Clusters::PowerSource::Attributes::BatPresent::Set(kPowerSourceEndpointId, true);
+	Clusters::PowerSource::Attributes::BatVoltage::Set(kPowerSourceEndpointId, static_cast<uint32_t>(voltageMv));
+	Clusters::PowerSource::Attributes::BatPercentRemaining::Set(kPowerSourceEndpointId, percentage);
+	Clusters::PowerSource::Attributes::BatChargeLevel::Set(kPowerSourceEndpointId, chargeLevel);
+}
+
 /// @brief Customises the PowerSource cluster.
 /// @param endpoint
 void emberAfPowerSourceClusterInitCallback(chip::EndpointId endpoint)
 {
-	LOG_INF("emberAfPowerSourceClusterServerInitCallback()");
+	LOG_INF("emberAfPowerSourceClusterInitCallback()");
 
 	Clusters::PowerSource::Attributes::Status::Set(endpoint, Clusters::PowerSource::PowerSourceStatusEnum::kActive);
 
 	Clusters::PowerSource::Attributes::Order::Set(endpoint, 0);
 
-	Clusters::PowerSource::Attributes::Description::Set(endpoint, chip::CharSpan::fromCharString("Power"));
+	Clusters::PowerSource::Attributes::Description::Set(endpoint, chip::CharSpan::fromCharString("Battery"));
 
-#ifdef CONFIG_PM_DEVICE
-	Clusters::PowerSource::Attributes::BatChargeLevel::Set(endpoint, Clusters::PowerSource::BatChargeLevelEnum::kOk);
-	Clusters::PowerSource::Attributes::BatReplacementNeeded::Set(endpoint, false);
 	Clusters::PowerSource::Attributes::BatReplaceability::Set(endpoint, Clusters::PowerSource::BatReplaceabilityEnum::kUserReplaceable);
-#else
-	Clusters::PowerSource::Attributes::WiredCurrentType::Set(endpoint, Clusters::PowerSource::WiredCurrentTypeEnum::kDc);
-#endif
+
+	Clusters::PowerSource::Attributes::BatReplacementNeeded::Set(endpoint, false);
 }
