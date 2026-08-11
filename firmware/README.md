@@ -39,4 +39,4 @@ west flash --recover
 ```
 
 > [!NOTE]
-> Ultimately, the use of protected firmware will be restored. I can learn some many things at once!
+> Ultimately, the use of protected firmware will be restored. I can only learn some many things at once!
