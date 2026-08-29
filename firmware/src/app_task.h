@@ -36,8 +36,14 @@ private:
 	static void BatteryTimerCallback(k_timer *timer);
 	static void IndicatorTimerCallback(k_timer *timer);
 	static void FactoryResetTimerCallback(k_timer *timer);
+	static void FactoryResetHandler();
+#ifdef CONFIG_CHIP_ICD_UAT_SUPPORT
+	static void UserActiveModeHandler();
+#endif
 
 	static void ResetButtonCallback(const struct device *dev, struct gpio_callback *cb, uint32_t pins);
+	static void ButtonDebounceTimerCallback(k_timer *timer);
+	static void ResetButtonHandler();
 
 	void ConfigureGPIO();
 };

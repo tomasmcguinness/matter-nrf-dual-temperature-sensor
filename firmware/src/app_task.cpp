@@ -30,6 +30,12 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/power-source-server/power-source-server.h>
 
+#ifdef CONFIG_CHIP_ENABLE_ICD_SUPPORT
+#include <app/icd/server/ICDConfigurationData.h>
+#include <app/icd/server/ICDStateObserver.h>
+#include <app/server/Server.h>
+#endif
+
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip;
@@ -40,19 +46,35 @@ k_timer sIndicatorTimer;
 k_timer sSensorTimer;
 k_timer sBatteryTimer;
 k_timer sFactoryResetTimer;
+k_timer sButtonDebounceTimer;
 bool mIndicatorState;
+
+// While the button is held the LED shows the button state, so the connectivity
+// blink patterns must leave it alone.
+//
+bool sButtonPressed;
 
 #if !DT_NODE_EXISTS(DT_PATH(zephyr_user)) || !DT_NODE_HAS_PROP(DT_PATH(zephyr_user), io_channels)
 #error "No suitable devicetree overlay specified"
 #endif
 
-#define SENSOR_READ_INTERVAL 5000
+// Read the temperature sensors every minute.
+#define SENSOR_READ_INTERVAL 60000 
 
 // A coin cell's voltage moves over months, so a daily sample is ample resolution.
 // The reading taken at start up covers cell replacement, which power cycles the
 // device anyway.
 //
 #define BATTERY_READ_INTERVAL_HOURS 24
+
+// The button is a bare mechanical switch with no hardware debouncing, so an
+// edge is only believed once the pin has been quiet for this long.
+//
+#define BUTTON_DEBOUNCE_MS 20
+
+// How long the button has to be held before the factory reset fires.
+//
+#define FACTORY_RESET_HOLD_SECONDS 5
 
 // TODO Move this to configuration (Maybe even Matter?), so they can be easily changed.
 //
@@ -95,6 +117,7 @@ static const struct gpio_dt_spec reset_button = GPIO_DT_SPEC_GET(RESET_BUTTON_NO
 
 constexpr EndpointId kLightEndpointId = 0;
 constexpr EndpointId kPowerSourceEndpointId = 0;
+constexpr EndpointId kDualTemperatureEndpointId = 3;
 
 Identify sIdentify = {kLightEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator};
 
@@ -141,10 +164,39 @@ void AppTask::IndicatorTimerCallback(k_timer *timer)
 
 void AppTask::FactoryResetTimerCallback(k_timer *timer)
 {
-	LOG_INF("Factory Reset Triggered!");
 	gpio_pin_set_dt(&indicator_led, 0);
+
+	Nrf::PostTask([]
+				  { AppTask::FactoryResetHandler(); });
+}
+
+/// @brief Runs on the app task, so it is safe to touch the CHIP stack here.
+void AppTask::FactoryResetHandler()
+{
+	LOG_INF("Factory Reset Triggered!");
+
 	chip::Server::GetInstance().ScheduleFactoryReset();
 }
+
+#ifdef CONFIG_CHIP_ICD_UAT_SUPPORT
+/// @brief Hands the ICD wake-up to the CHIP thread.
+///
+/// ScheduleWork() rather than LockChipStack() on the app task: the CHIP thread
+/// already holds the stack lock when it runs the work, and the app task is left
+/// free to keep dispatching - a button release, or a sensor read, is not stuck
+/// behind however long the ICD manager takes.
+void AppTask::UserActiveModeHandler()
+{
+	LOG_INF("ICD UserActiveMode is enabled. Moving to ActiveMode...");
+
+	chip::DeviceLayer::PlatformMgr().ScheduleWork([](intptr_t)
+												  {
+		Server::GetInstance().GetICDManager().OnNetworkActivity();
+
+		LOG_INF("Successfully triggered ICD UserActiveMode!"); },
+												  0);
+}
+#endif
 
 void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t data)
 {
@@ -163,6 +215,13 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t data)
 		break;
 	}
 
+	// The button owns the LED while it is held.
+	//
+	if (sButtonPressed)
+	{
+		return;
+	}
+
 	if (isNetworkProvisioned)
 	{
 		LOG_INF("Network is provisioned!");
@@ -171,7 +230,7 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t data)
 
 		gpio_pin_set_dt(&indicator_led, 0);
 
-		// Wait 1s then fire the timer, then fire every READ_INTERVAL
+		// Wait 1s then fire the timer for the first time. Then fire every SENSOR_READ_INTERVAL
 		k_timer_start(&sSensorTimer, K_MSEC(1000), K_MSEC(SENSOR_READ_INTERVAL));
 	}
 	else if (isBleConnected)
@@ -194,16 +253,90 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t data)
 	}
 }
 
+#ifdef CONFIG_CHIP_ENABLE_ICD_SUPPORT
+/// @brief Logs every ICD idle/active transition.
+///
+/// The stack keeps this state to itself - nothing in the ICD manager logs a
+/// transition - so without an observer there is no way to tell from the console
+/// when a long idle period actually began. The callbacks run synchronously on
+/// the CHIP thread from inside the state change, so they must stay short.
+///
+class ICDStateLogger : public ICDStateObserver
+{
+public:
+	void OnEnterIdleMode() override
+	{
+		ICDConfigurationData &config = ICDConfigurationData::GetInstance();
+
+		LOG_INF("ICD: entered IdleMode for up to %u s, polling every %u ms",
+				static_cast<unsigned int>(config.GetIdleModeDuration().count()),
+				static_cast<unsigned int>(config.GetSlowPollingInterval().count()));
+	}
+
+	void OnEnterActiveMode() override
+	{
+		ICDConfigurationData &config = ICDConfigurationData::GetInstance();
+
+		LOG_INF("ICD: entered ActiveMode for %u ms, polling every %u ms",
+				static_cast<unsigned int>(config.GetActiveModeDuration().count()),
+				static_cast<unsigned int>(config.GetFastPollingInterval().count()));
+	}
+
+	/// @brief Fires ICD_ACTIVE_TIME_JITTER_MS (300 ms) before IdleMode is entered,
+	/// and only once per active period.
+	void OnTransitionToIdle() override
+	{
+		LOG_INF("ICD: about to enter IdleMode");
+	}
+
+	void OnICDModeChange() override
+	{
+		LOG_INF("ICD: operating mode is now %s",
+				ICDConfigurationData::GetInstance().GetICDMode() == ICDConfigurationData::ICDMode::LIT ? "LIT" : "SIT");
+	}
+};
+
+ICDStateLogger sICDStateLogger;
+#endif
+
 CHIP_ERROR AppTask::Init()
 {
 	LOG_INF("Init()");
 
 	ReturnErrorOnFailure(Nrf::Matter::PrepareServer(Nrf::Matter::InitData{.mDeviceInfoProvider = &DeviceInfoProviderImpl::GetDefaultInstance()}));
 
+#ifdef CONFIG_CHIP_ENABLE_ICD_SUPPORT
+	// Registered here rather than after StartServer(), because ICDManager::Init()
+	// drops straight into IdleMode and an observer added later would miss that
+	// first transition. PrepareServer() only queues the server initialisation -
+	// the CHIP thread does not run until StartServer() - so there is nothing to
+	// race with, and the observer pool itself is alive from static init.
+	//
+	if (Server::GetInstance().GetICDManager().RegisterObserver(&sICDStateLogger) == nullptr)
+	{
+		LOG_ERR("Could not register the ICD state logger - CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE is too small");
+	}
+#endif
+
 	k_timer_init(&sIndicatorTimer, &IndicatorTimerCallback, nullptr);
 	k_timer_user_data_set(&sIndicatorTimer, this);
 
 	ReturnErrorOnFailure(Nrf::Matter::RegisterEventHandler(AppTask::MatterEventHandler, 0));
+
+	// Every timer is initialised before ConfigureGPIO(), because that enables
+	// the button interrupt and the callback starts the debounce timer.
+	//
+	k_timer_init(&sSensorTimer, &SensorTimerCallback, nullptr);
+	k_timer_user_data_set(&sSensorTimer, this);
+
+	k_timer_init(&sBatteryTimer, &BatteryTimerCallback, nullptr);
+	k_timer_user_data_set(&sBatteryTimer, this);
+
+	k_timer_init(&sFactoryResetTimer, &FactoryResetTimerCallback, nullptr);
+	k_timer_user_data_set(&sFactoryResetTimer, this);
+
+	k_timer_init(&sButtonDebounceTimer, &ButtonDebounceTimerCallback, nullptr);
+	k_timer_user_data_set(&sButtonDebounceTimer, this);
 
 	ConfigureGPIO();
 
@@ -215,15 +348,6 @@ CHIP_ERROR AppTask::Init()
 	k_sleep(K_SECONDS(1));
 
 	gpio_pin_set_dt(&indicator_led, 0);
-
-	k_timer_init(&sSensorTimer, &SensorTimerCallback, nullptr);
-	k_timer_user_data_set(&sSensorTimer, this);
-
-	k_timer_init(&sBatteryTimer, &BatteryTimerCallback, nullptr);
-	k_timer_user_data_set(&sBatteryTimer, this);
-
-	k_timer_init(&sFactoryResetTimer, &FactoryResetTimerCallback, nullptr);
-	k_timer_user_data_set(&sFactoryResetTimer, this);
 
 	return Nrf::Matter::StartServer();
 }
@@ -247,27 +371,80 @@ CHIP_ERROR AppTask::StartApp()
 	return CHIP_NO_ERROR;
 }
 
+void DeferUserActiveMode(intptr_t arg)
+{
+#ifdef CONFIG_CHIP_ICD_UAT_SUPPORT
+    // Safely notify the ICD Manager of user/network activity to force UserActiveMode
+    Server::GetInstance().GetICDManager().OnNetworkActivity();
+    
+    // Optional: Log the status using the Matter logging system
+    LOG_INF("ICD UserActiveMode has been safely triggered via background task.");
+#endif
+}
+
 void AppTask::ResetButtonCallback(const struct device *dev, struct gpio_callback *cb, gpio_port_pins_t pins)
 {
-	// Check if the button is pressed.
+	bool pressed = gpio_pin_get_dt(&reset_button) == 1;
+
+	if(pressed) {
+		LOG_INF("Reset Button Pressed");
+		chip::DeviceLayer::PlatformMgr().ScheduleWork(DeferUserActiveMode, 0);
+	}
+	else {
+		LOG_INF("Reset Button Released");
+	}
+	
+	// // This runs in interrupt context. It must do as close to nothing as
+	// // possible - in particular no logging, because CONFIG_LOG_MODE_IMMEDIATE
+	// // writes to the backend inline and doing that from an ISR can deadlock
+	// // against a thread that is already inside the logger.
+	// //
+	// // Every edge just restarts the debounce timer, so the pin is only sampled
+	// // once the switch has stopped bouncing.
+	// //
+	// k_timer_start(&sButtonDebounceTimer, K_MSEC(BUTTON_DEBOUNCE_MS), K_NO_WAIT);
+}
+
+/// @brief Fires once the button has been quiet for BUTTON_DEBOUNCE_MS. Still
+/// interrupt context, so the real work goes to the app task.
+void AppTask::ButtonDebounceTimerCallback(k_timer *timer)
+{
+	Nrf::PostTask([]
+				  { AppTask::ResetButtonHandler(); });
+}
+
+/// @brief Runs on the app task, where logging and the CHIP stack lock are safe.
+void AppTask::ResetButtonHandler()
+{
+	bool pressed = gpio_pin_get_dt(&reset_button) == 1;
+
+	// A bounce that settled back where it started is not a state change.
 	//
-	if (gpio_pin_get_dt(&reset_button) == 1)
+	if (pressed == sButtonPressed)
+	{
+		return;
+	}
+
+	sButtonPressed = pressed;
+
+	if (pressed)
 	{
 		LOG_INF("Reset Button Pushed");
+
+		// Take the LED off the indicator timer for as long as the button is
+		// held, otherwise the blink pattern fights the solid "button down"
+		// state - OnNetworkActivity() below generates CHIP events, and
+		// MatterEventHandler restarts the indicator timer on every one.
+		//
+		k_timer_stop(&sIndicatorTimer);
 
 		gpio_pin_set_dt(&indicator_led, 1);
 
 #ifdef CONFIG_CHIP_ICD_UAT_SUPPORT
-		LOG_INF("ICD UserActiveMode is enabled. Moving to ActiveMode...");
-
-		chip::DeviceLayer::PlatformMgr().LockChipStack();
-		Server::GetInstance().GetICDManager().OnNetworkActivity();
-		chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
-		LOG_INF("Successfully triggered ICD UserActiveMode!");
+		UserActiveModeHandler();
 #endif
 
-		k_timer_start(&sFactoryResetTimer, K_SECONDS(5), K_NO_WAIT);
+		k_timer_start(&sFactoryResetTimer, K_SECONDS(FACTORY_RESET_HOLD_SECONDS), K_NO_WAIT);
 	}
 	else
 	{
@@ -356,7 +533,9 @@ void AppTask::ConfigureGPIO()
 		return;
 	}
 
-	err = gpio_pin_interrupt_configure_dt(&reset_button, GPIO_INT_EDGE_TO_ACTIVE);
+	// Both edges, so a release before the 5s hold can cancel the factory reset.
+	//
+	err = gpio_pin_interrupt_configure_dt(&reset_button, GPIO_INT_EDGE_BOTH);
 
 	if (err != 0)
 	{
@@ -445,17 +624,13 @@ void AppTask::SensorMeasureHandler()
 	// time so the voltage stabalises.
 	//
 	gpio_pin_set_dt(&probe_1_divider_power, 1);
-	k_sleep(K_MSEC(2));
+	k_sleep(K_MSEC(50));
 
 	int16_t probe_1_temperature = read_probe_temperature(1) * 100; // Convert temperature to Matter
 	gpio_pin_set_dt(&probe_1_divider_power, 0);
 
-	// Leave a small gap between each reading.
-	//
-	k_sleep(K_MSEC(2));
-
 	gpio_pin_set_dt(&probe_2_divider_power, 1);
-	k_sleep(K_MSEC(2));
+	k_sleep(K_MSEC(50));
 
 	int16_t probe_2_temperature = read_probe_temperature(2) * 100; // Convert temperature to Matter
 	gpio_pin_set_dt(&probe_2_divider_power, 0);
@@ -464,6 +639,12 @@ void AppTask::SensorMeasureHandler()
 	//
 	chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, probe_1_temperature);
 	chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(2, probe_2_temperature);
+
+	// Publish the same pair to the manufacturer-specific cluster, so a single read
+	// returns both probes as sampled in this pass.
+	//
+	Clusters::DualTemperatureMeasurement::Attributes::Probe1MeasuredValue::Set(kDualTemperatureEndpointId, probe_1_temperature);
+	Clusters::DualTemperatureMeasurement::Attributes::Probe2MeasuredValue::Set(kDualTemperatureEndpointId, probe_2_temperature);
 }
 
 void AppTask::BatteryMeasureHandler()
@@ -533,4 +714,12 @@ void emberAfPowerSourceClusterInitCallback(chip::EndpointId endpoint)
 	Clusters::PowerSource::Attributes::BatReplaceability::Set(endpoint, Clusters::PowerSource::BatReplaceabilityEnum::kUserReplaceable);
 
 	Clusters::PowerSource::Attributes::BatReplacementNeeded::Set(endpoint, false);
+}
+
+/// @brief Required by MATTER_PLUGINS_INIT. The DualTemperatureMeasurement cluster is
+/// manufacturer-specific, so the Matter SDK provides no implementation of this hook.
+/// Nothing needs initialising: both attributes are RAM backed and are written by
+/// SensorMeasureHandler().
+void MatterDualTemperatureMeasurementPluginServerInitCallback()
+{
 }

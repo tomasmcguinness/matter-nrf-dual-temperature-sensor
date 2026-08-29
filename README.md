@@ -31,6 +31,7 @@ The code is written using the Nordic Connect SDK, v3.3.0.
 - [x] Press and hold to reset
 - [x] User labels to name the probes
 - [x] Report the battery level
+- [x] Custom cluster reporting both probes from one endpoint
 
 ## Hardware
 
