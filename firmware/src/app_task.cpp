@@ -643,8 +643,8 @@ void AppTask::SensorMeasureHandler()
 	// Publish the same pair to the manufacturer-specific cluster, so a single read
 	// returns both probes as sampled in this pass.
 	//
-	Clusters::DualTemperatureMeasurement::Attributes::Probe1MeasuredValue::Set(kDualTemperatureEndpointId, probe_1_temperature);
-	Clusters::DualTemperatureMeasurement::Attributes::Probe2MeasuredValue::Set(kDualTemperatureEndpointId, probe_2_temperature);
+	//Clusters::DualTemperatureMeasurement::Attributes::Probe1MeasuredValue::Set(kDualTemperatureEndpointId, probe_1_temperature);
+	//Clusters::DualTemperatureMeasurement::Attributes::Probe2MeasuredValue::Set(kDualTemperatureEndpointId, probe_2_temperature);
 }
 
 void AppTask::BatteryMeasureHandler()
