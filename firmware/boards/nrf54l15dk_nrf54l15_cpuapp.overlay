@@ -55,9 +55,21 @@
 	#size-cells = <0>;
     status = "okay";
 
+	/* Probe dividers. Powered from a GPIO switching VDD, so the node swings
+	 * against the cell voltage rather than a fixed rail, and it is the NTC's
+	 * high-resistance (cold) end that pushes the node up towards the supply.
+	 *
+	 * Gain 1/4 against the 900 mV internal reference puts full scale at 3.6 V,
+	 * which covers the whole rail. Gain 1/2 would cap it at 1.8 V - with a fresh
+	 * 3.0 V cell that saturates below about 16 C, and below about 5 C at 2.5 V.
+	 *
+	 * The battery channel below deliberately uses the same gain: the resistance
+	 * is derived from the ratio of these two readings, and matching gains keeps
+	 * that ratio a straight division.
+	 */
 	channel@0 {
 		reg = <0>;
-		zephyr,gain = "ADC_GAIN_1_2";
+		zephyr,gain = "ADC_GAIN_1_4";
 		zephyr,reference = "ADC_REF_INTERNAL";
 		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
 		zephyr,input-positive = <NRF_SAADC_AIN5>;
@@ -67,7 +79,7 @@
 
 	channel@1 {
 		reg = <1>;
-		zephyr,gain = "ADC_GAIN_1_2";
+		zephyr,gain = "ADC_GAIN_1_4";
 		zephyr,reference = "ADC_REF_INTERNAL";
 		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
 		zephyr,input-positive = <NRF_SAADC_AIN4>;
