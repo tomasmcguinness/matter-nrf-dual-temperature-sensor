@@ -23,7 +23,6 @@
 #include <math.h>
 
 #include "DeviceInfoProviderImpl.h"
-#include "battery.h"
 
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -36,6 +35,9 @@
 #include <app/server/Server.h>
 #endif
 
+#include <zephyr/drivers/hwinfo.h>
+#include <zephyr/sys/poweroff.h>
+
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
 
 using namespace ::chip;
@@ -46,13 +48,10 @@ k_timer sIndicatorTimer;
 k_timer sSensorTimer;
 k_timer sBatteryTimer;
 k_timer sFactoryResetTimer;
-k_timer sButtonDebounceTimer;
+
 bool mIndicatorState;
 
-// While the button is held the LED shows the button state, so the connectivity
-// blink patterns must leave it alone.
-//
-bool sButtonPressed;
+int32_t measure_battery_voltage();
 
 #if !DT_NODE_EXISTS(DT_PATH(zephyr_user)) || !DT_NODE_HAS_PROP(DT_PATH(zephyr_user), io_channels)
 #error "No suitable devicetree overlay specified"
@@ -67,17 +66,16 @@ bool sButtonPressed;
 //
 #define BATTERY_READ_INTERVAL_HOURS 24
 
-// The button is a bare mechanical switch with no hardware debouncing, so an
-// edge is only believed once the pin has been quiet for this long.
-//
-#define BUTTON_DEBOUNCE_MS 20
-
 // How long the button has to be held before the factory reset fires.
 //
 #define FACTORY_RESET_HOLD_SECONDS 5
 
-// TODO Move this to configuration (Maybe even Matter?), so they can be easily changed.
+// How long the probe divider is left powered before it is sampled. The 100nF
+// across the thermistor and a ~5k source impedance settle in well under a
+// millisecond, so this is generous.
 //
+#define PROBE_SETTLE_MS 50
+
 #define THERMISTORNOMINAL 10000
 #define TEMPERATURENOMINAL 25
 #define BCOEFFICIENT 3977
@@ -101,6 +99,7 @@ constexpr uint8_t kMaxBatteryPercentage = 200;
 static const struct adc_dt_spec adc_channels[] = {
 	ADC_DT_SPEC_GET_BY_NAME(DT_PATH(zephyr_user), probe_1),
 	ADC_DT_SPEC_GET_BY_NAME(DT_PATH(zephyr_user), probe_2),
+	ADC_DT_SPEC_GET_BY_NAME(DT_PATH(zephyr_user), battery)
 };
 
 #define PROBE_1_DIVIDER_POWER_NODE DT_NODELABEL(probe_1_divider_power)
@@ -117,6 +116,8 @@ static const struct gpio_dt_spec reset_button = GPIO_DT_SPEC_GET(RESET_BUTTON_NO
 
 constexpr EndpointId kLightEndpointId = 0;
 constexpr EndpointId kPowerSourceEndpointId = 0;
+constexpr EndpointId kProbe1EndpointId = 1;
+constexpr EndpointId kProbe2EndpointId = 2;
 constexpr EndpointId kDualTemperatureEndpointId = 3;
 
 Identify sIdentify = {kLightEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator};
@@ -155,7 +156,7 @@ void AppTask::BatteryTimerCallback(k_timer *timer)
 
 void AppTask::IndicatorTimerCallback(k_timer *timer)
 {
-	// LOG_DBG("LED Indicator: %d", mIndicatorState);
+	LOG_DBG("LED Indicator: %d", mIndicatorState);
 
 	mIndicatorState = !mIndicatorState;
 
@@ -202,7 +203,7 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t data)
 {
 	static bool isNetworkProvisioned = false;
 	static bool isBleConnected = false;
-
+	
 	switch (event->Type)
 	{
 	case DeviceEventType::kCHIPoBLEAdvertisingChange:
@@ -215,24 +216,13 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t data)
 		break;
 	}
 
-	// The button owns the LED while it is held.
-	//
-	if (sButtonPressed)
-	{
-		return;
-	}
-
 	if (isNetworkProvisioned)
 	{
 		LOG_INF("Network is provisioned!");
 
 		k_timer_stop(&sIndicatorTimer);
-
 		gpio_pin_set_dt(&indicator_led, 0);
-
-		// Wait 1s then fire the timer for the first time. Then fire every SENSOR_READ_INTERVAL
-		k_timer_start(&sSensorTimer, K_MSEC(1000), K_MSEC(SENSOR_READ_INTERVAL));
-	}
+	} 
 	else if (isBleConnected)
 	{
 		LOG_INF("Bluetooth connection opened");
@@ -323,24 +313,17 @@ CHIP_ERROR AppTask::Init()
 
 	ReturnErrorOnFailure(Nrf::Matter::RegisterEventHandler(AppTask::MatterEventHandler, 0));
 
-	// Every timer is initialised before ConfigureGPIO(), because that enables
-	// the button interrupt and the callback starts the debounce timer.
-	//
+	ConfigureGPIO();
+
 	k_timer_init(&sSensorTimer, &SensorTimerCallback, nullptr);
 	k_timer_user_data_set(&sSensorTimer, this);
+	k_timer_start(&sSensorTimer, K_MSEC(1000), K_MSEC(SENSOR_READ_INTERVAL));
 
 	k_timer_init(&sBatteryTimer, &BatteryTimerCallback, nullptr);
 	k_timer_user_data_set(&sBatteryTimer, this);
+	k_timer_start(&sBatteryTimer, K_MSEC(1000), K_HOURS(BATTERY_READ_INTERVAL_HOURS));
 
-	k_timer_init(&sFactoryResetTimer, &FactoryResetTimerCallback, nullptr);
-	k_timer_user_data_set(&sFactoryResetTimer, this);
-
-	k_timer_init(&sButtonDebounceTimer, &ButtonDebounceTimerCallback, nullptr);
-	k_timer_user_data_set(&sButtonDebounceTimer, this);
-
-	ConfigureGPIO();
-
-	// Turn on the indicator LED to start with.
+	// Turn on the indicator LED for one second.
 	// Gives an indication that the device is alive!
 	//
 	gpio_pin_set_dt(&indicator_led, 1);
@@ -349,19 +332,23 @@ CHIP_ERROR AppTask::Init()
 
 	gpio_pin_set_dt(&indicator_led, 0);
 
-	return Nrf::Matter::StartServer();
+	CHIP_ERROR server_error = Nrf::Matter::StartServer();
+
+	if (server_error != CHIP_NO_ERROR)
+	{
+		LOG_ERR("StartServer() failed: %" CHIP_ERROR_FORMAT, server_error.Format());
+	}
+	else
+	{
+		LOG_INF("StartServer() returned CHIP_NO_ERROR");
+	}
+
+	return server_error;
 }
 
 CHIP_ERROR AppTask::StartApp()
 {
 	ReturnErrorOnFailure(Init());
-
-	// Started here, after StartServer(), so the first measurement cannot land
-	// before the PowerSource cluster exists. Unlike the sensor timer this is not
-	// held back until the device is provisioned - the battery level should be
-	// populated before a controller first reads it during commissioning.
-	//
-	k_timer_start(&sBatteryTimer, K_MSEC(1000), K_HOURS(BATTERY_READ_INTERVAL_HOURS));
 
 	while (true)
 	{
@@ -371,38 +358,8 @@ CHIP_ERROR AppTask::StartApp()
 	return CHIP_NO_ERROR;
 }
 
-void DeferUserActiveMode(intptr_t arg)
-{
-#ifdef CONFIG_CHIP_ICD_UAT_SUPPORT
-    // Safely notify the ICD Manager of user/network activity to force UserActiveMode
-    Server::GetInstance().GetICDManager().OnNetworkActivity();
-    
-    // Optional: Log the status using the Matter logging system
-    LOG_INF("ICD UserActiveMode has been safely triggered via background task.");
-#endif
-}
-
 void AppTask::ResetButtonCallback(const struct device *dev, struct gpio_callback *cb, gpio_port_pins_t pins)
 {
-	bool pressed = gpio_pin_get_dt(&reset_button) == 1;
-
-	if(pressed) {
-		LOG_INF("Reset Button Pressed");
-		chip::DeviceLayer::PlatformMgr().ScheduleWork(DeferUserActiveMode, 0);
-	}
-	else {
-		LOG_INF("Reset Button Released");
-	}
-	
-	// // This runs in interrupt context. It must do as close to nothing as
-	// // possible - in particular no logging, because CONFIG_LOG_MODE_IMMEDIATE
-	// // writes to the backend inline and doing that from an ISR can deadlock
-	// // against a thread that is already inside the logger.
-	// //
-	// // Every edge just restarts the debounce timer, so the pin is only sampled
-	// // once the switch has stopped bouncing.
-	// //
-	// k_timer_start(&sButtonDebounceTimer, K_MSEC(BUTTON_DEBOUNCE_MS), K_NO_WAIT);
 }
 
 /// @brief Fires once the button has been quiet for BUTTON_DEBOUNCE_MS. Still
@@ -417,15 +374,6 @@ void AppTask::ButtonDebounceTimerCallback(k_timer *timer)
 void AppTask::ResetButtonHandler()
 {
 	bool pressed = gpio_pin_get_dt(&reset_button) == 1;
-
-	// A bounce that settled back where it started is not a state change.
-	//
-	if (pressed == sButtonPressed)
-	{
-		return;
-	}
-
-	sButtonPressed = pressed;
 
 	if (pressed)
 	{
@@ -444,6 +392,22 @@ void AppTask::ResetButtonHandler()
 		UserActiveModeHandler();
 #endif
 
+		// Take a fresh set of readings, so a controller that wakes the device with
+		// this button does not read a value up to SENSOR_READ_INTERVAL old, or a
+		// battery level up to BATTERY_READ_INTERVAL_HOURS old.
+		//
+		// Posted rather than called inline: SensorMeasureHandler() blocks for ~100 ms
+		// settling the dividers, and the release edge should not be stuck behind it.
+		//
+		// The battery is sampled after the probes, once the dividers are switched off
+		// again, so the button path measures the same unloaded rail the daily timer does.
+		//
+		Nrf::PostTask([]
+					  {
+						  AppTask::SensorMeasureHandler();
+						  AppTask::BatteryMeasureHandler();
+					  });
+
 		k_timer_start(&sFactoryResetTimer, K_SECONDS(FACTORY_RESET_HOLD_SECONDS), K_NO_WAIT);
 	}
 	else
@@ -451,19 +415,22 @@ void AppTask::ResetButtonHandler()
 		LOG_INF("Reset Button Released");
 
 		gpio_pin_set_dt(&indicator_led, 0);
+
 		k_timer_stop(&sFactoryResetTimer);
 	}
 }
 
 void AppTask::ConfigureGPIO()
 {
+	int err = 0;
+
 	if (!gpio_is_ready_dt(&probe_1_divider_power))
 	{
 		LOG_ERR("Cannot configure Divider 1 Power");
 		return;
 	}
 
-	int err = gpio_pin_configure_dt(&probe_1_divider_power, GPIO_OUTPUT_INACTIVE);
+	err = gpio_pin_configure_dt(&probe_1_divider_power, GPIO_OUTPUT_INACTIVE);
 	if (err != 0)
 	{
 		LOG_ERR("Configuring Divider 1 Power pin failed (err: %d)", err);
@@ -473,14 +440,14 @@ void AppTask::ConfigureGPIO()
 	if (!gpio_is_ready_dt(&probe_2_divider_power))
 	{
 		LOG_ERR("Cannot configure Divider 2 Power");
-		return;
+	 	return;
 	}
 
 	err = gpio_pin_configure_dt(&probe_2_divider_power, GPIO_OUTPUT_INACTIVE);
 	if (err != 0)
 	{
 		LOG_ERR("Configuring Divider 2 Power pin failed (err: %d)", err);
-		return;
+	 	return;
 	}
 
 	for (size_t i = 0U; i < ARRAY_SIZE(adc_channels); i++)
@@ -502,8 +469,6 @@ void AppTask::ConfigureGPIO()
 		LOG_INF("Successfully setup ADC channel #%d", i);
 	}
 
-	BatteryMeasurementInit();
-
 	if (!gpio_is_ready_dt(&indicator_led))
 	{
 		LOG_ERR("Cannot configure indicator LED");
@@ -522,7 +487,7 @@ void AppTask::ConfigureGPIO()
 	if (!gpio_is_ready_dt(&reset_button))
 	{
 		LOG_ERR("Reset button is not ready");
-		return;
+	 	return;
 	}
 
 	err = gpio_pin_configure_dt(&reset_button, GPIO_INPUT | GPIO_ACTIVE_HIGH);
@@ -534,6 +499,7 @@ void AppTask::ConfigureGPIO()
 	}
 
 	// Both edges, so a release before the 5s hold can cancel the factory reset.
+	// GPIO_INT_LEVEL_HIGH
 	//
 	err = gpio_pin_interrupt_configure_dt(&reset_button, GPIO_INT_EDGE_BOTH);
 
@@ -566,7 +532,23 @@ struct adc_sequence adc_sequence = {
 	.calibrate = true,
 };
 
-double read_probe_temperature(int probe_number)
+/// @brief Reads one probe's divider and returns the thermistor resistance in ohms.
+///
+/// There is no fixed reference to divide against: the divider is fed from a GPIO
+/// switching VDD, and the coin cell drives VDD directly, so the supply moves as
+/// the cell discharges. Only the ratio of the divider node to its own supply
+/// matters:
+///
+///     Vnode = Vsupply * Rt / (SERIESRESISTOR + Rt)
+///       =>  Rt = SERIESRESISTOR * Vnode / (Vsupply - Vnode)
+///
+/// so the supply is measured for every reading rather than assumed. Both samples
+/// go through the same SAADC and the same internal reference, so the reference
+/// error cancels in the ratio and its absolute accuracy stops mattering.
+///
+/// @param supply_mv the divider supply, sampled while the divider is energised.
+/// @return the resistance in ohms, or a negative errno.
+double read_probe_resistance(int probe_number, int32_t supply_mv)
 {
 	int channel = probe_number - 1;
 
@@ -577,7 +559,7 @@ double read_probe_temperature(int probe_number)
 	if (err < 0)
 	{
 		LOG_ERR("Could not initialise ADC%d (%d)", channel, err);
-		return -1;
+		return err;
 	}
 
 	err = adc_read_dt(&adc_channel, &adc_sequence);
@@ -585,21 +567,40 @@ double read_probe_temperature(int probe_number)
 	if (err < 0)
 	{
 		LOG_ERR("Could not read ADC%d (%d)", channel, err);
-		return -1;
+		return err;
 	}
 
-	int32_t val_mv = (int32_t)adc_sequence_buf;
+	int32_t raw = (int32_t)adc_sequence_buf;
+	int32_t val_mv = raw;
 
 	err = adc_raw_to_millivolts_dt(&adc_channel, &val_mv);
 
 	if (err < 0)
 	{
-		LOG_ERR(" (value in mV not available)\n");
-		return -1;
+		LOG_ERR("ADC%d value in mV not available (%d)", channel, err);
+		return err;
 	}
 
-	float resistance = (val_mv * SERIESRESISTOR) / (2200 /* Ref voltage of 900 with a GAIN of 1_2 */ - val_mv);
+	LOG_INF("PROBE #%d: raw %" PRId32 ", %" PRId32 " mV of %" PRId32 " mV", probe_number, raw, val_mv,
+			supply_mv);
 
+	// An unplugged probe leaves the node sitting at the supply, and a shorted one
+	// pulls it to ground. Neither is a temperature, and both would blow up either
+	// the division below or the log() in resistance_to_celsius().
+	//
+	if (val_mv <= 0 || val_mv >= supply_mv)
+	{
+		LOG_ERR("Probe %d is out of range - check that it is connected", probe_number);
+		return -EIO;
+	}
+
+	return (double)val_mv * SERIESRESISTOR / (double)(supply_mv - val_mv);
+}
+
+/// @brief Converts a thermistor resistance to degrees Celsius, using the
+/// B-parameter form of the Steinhart-Hart equation.
+double resistance_to_celsius(double resistance)
+{
 	double steinhart;
 	steinhart = resistance / THERMISTORNOMINAL;		  // (R/Ro)
 	steinhart = log(steinhart);						  // ln(R/Ro)
@@ -608,57 +609,151 @@ double read_probe_temperature(int probe_number)
 	steinhart = 1.0 / steinhart;					  // Invert
 	steinhart -= 273.15;							  // Convert to Celcius
 
-	double value = steinhart;
+	return steinhart;
+}
 
-	LOG_INF("CHANNEL #%d: V: %" PRId32 " mV", channel, val_mv);
-	// LOG_INF("A: %d", adc_sequence);
-	// LOG_INF("R: %d", (int)resistance);
-	// LOG_INF("T: %d", value);
+/// @brief Powers one probe's divider, samples it, and converts the result to the
+/// hundredths of a degree that Matter reports.
+/// @return true if the reading is usable, false if it should not be published.
+bool measure_probe(int probe_number, const struct gpio_dt_spec &divider_power, int16_t &out_value)
+{
+	// Switch on the power pin. Let the power stay on for a short period of
+	// time so the voltage stabalises.
+	//
+	gpio_pin_set_dt(&divider_power, 1);
+	k_sleep(K_MSEC(PROBE_SETTLE_MS));
 
-	return value;
+	// Sampled here, inside the powered window, rather than reused from the daily
+	// battery reading. The divider draws ~150 uA and a coin cell's ESR rises as it
+	// ages, so the rail sags a little under that load - measuring the supply while
+	// the load is applied makes the sag common to both samples, and it cancels in
+	// the ratio along with the reference error.
+	//
+	int32_t supply_mv = measure_battery_voltage();
+
+	if (supply_mv < 0)
+	{
+	 	LOG_ERR("Probe %d: supply voltage unavailable (%" PRId32 ")", probe_number, supply_mv);
+		return false;
+	}
+
+	LOG_INF("Probe %d: VDD %" PRId32 " mV", probe_number, supply_mv);
+
+	double resistance = 0;
+	bool valid = false;
+
+	resistance = read_probe_resistance(probe_number, supply_mv);
+	valid = resistance > 0;
+
+	// Switched off on the error paths too - an energised divider is a permanent
+	// ~150 uA on a coin cell.
+	//
+	gpio_pin_set_dt(&divider_power, 0);
+
+	if (!valid)
+	{
+		return false;
+	}
+
+	out_value = (int16_t)(resistance_to_celsius(resistance) * 100);
+
+	// Logged in hundredths, the same units Matter reports, split into whole degrees
+	// and fraction because the build has no floating point printf support.
+	//
+	int whole = out_value / 100;
+	int fraction = out_value % 100;
+
+	if (fraction < 0)
+	{
+		fraction = -fraction;
+	}
+
+	LOG_INF("Probe %d: %" PRId32 " ohms, %s%d.%02d C", probe_number, (int32_t)resistance,
+			(out_value < 0 && whole == 0) ? "-" : "", whole, fraction);
+
+ 	return true;
+}
+
+int32_t measure_battery_voltage()
+{
+	int channel = 2;
+
+	adc_dt_spec adc_channel = adc_channels[channel];
+
+	int err = adc_sequence_init_dt(&adc_channel, &adc_sequence);
+
+	if (err < 0) {
+		LOG_ERR("Could not initialise the battery ADC sequence (%d)", err);
+		return err;
+	}
+
+	err = adc_read_dt(&adc_channel, &adc_sequence);
+
+	if (err < 0) {
+		LOG_ERR("Could not read the battery ADC (%d)", err);
+		return err;
+	}
+
+	int32_t raw = static_cast<int32_t>(adc_sequence_buf);
+	int32_t voltageMv = raw;
+
+	err = adc_raw_to_millivolts_dt(&adc_channel, &voltageMv);
+
+	if (err < 0) {
+		LOG_ERR("Battery value in mV not available (%d)", err);
+		return err;
+	}
+
+	LOG_INF("VDD: raw %" PRId32 ", %" PRId32 " mV", raw, voltageMv);
+
+	return voltageMv;
 }
 
 void AppTask::SensorMeasureHandler()
 {
-	// Switch on the power pins. Let the power stay on for a short period of
-	// time so the voltage stabalises.
+	int16_t probe_1_temperature;
+	int16_t probe_2_temperature;
+
+	bool probe_1_valid = measure_probe(1, probe_1_divider_power, probe_1_temperature);
+	bool probe_2_valid = measure_probe(2, probe_2_divider_power, probe_2_temperature);
+
+	// With both readings taken, update both of the clusters. MeasuredValue is
+	// nullable, and null is what the spec has for "no usable reading" - leaving the
+	// last good value in place would look like a live temperature.
 	//
-	gpio_pin_set_dt(&probe_1_divider_power, 1);
-	k_sleep(K_MSEC(50));
+	PlatformMgr().LockChipStack();
 
-	int16_t probe_1_temperature = read_probe_temperature(1) * 100; // Convert temperature to Matter
-	gpio_pin_set_dt(&probe_1_divider_power, 0);
+	LOG_INF("Publishing temperatures...");
 
-	gpio_pin_set_dt(&probe_2_divider_power, 1);
-	k_sleep(K_MSEC(50));
+	if (probe_1_valid)
+	{
+		Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(kProbe1EndpointId, probe_1_temperature);
+	}
+	else
+	{
+		Clusters::TemperatureMeasurement::Attributes::MeasuredValue::SetNull(kProbe1EndpointId);
+	}
 
-	int16_t probe_2_temperature = read_probe_temperature(2) * 100; // Convert temperature to Matter
-	gpio_pin_set_dt(&probe_2_divider_power, 0);
+	if (probe_2_valid)
+	{
+		Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(kProbe2EndpointId, probe_2_temperature);
+	}
+	else
+	{
+		Clusters::TemperatureMeasurement::Attributes::MeasuredValue::SetNull(kProbe2EndpointId);
+	}
 
-	// With both readings taken, update both of the clusters.
-	//
-	chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(1, probe_1_temperature);
-	chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(2, probe_2_temperature);
-
-	// Publish the same pair to the manufacturer-specific cluster, so a single read
-	// returns both probes as sampled in this pass.
+	// Return to this once I figure out custom clusters
 	//
 	//Clusters::DualTemperatureMeasurement::Attributes::Probe1MeasuredValue::Set(kDualTemperatureEndpointId, probe_1_temperature);
 	//Clusters::DualTemperatureMeasurement::Attributes::Probe2MeasuredValue::Set(kDualTemperatureEndpointId, probe_2_temperature);
+
+	PlatformMgr().UnlockChipStack();
 }
 
 void AppTask::BatteryMeasureHandler()
 {
-	int32_t voltageMv = BatteryMeasurementReadVoltageMv();
-
-	if (voltageMv < 0)
-	{
-		LOG_ERR("Battery measurement failed (%" PRId32 ")", voltageMv);
-
-		Clusters::PowerSource::Attributes::Status::Set(kPowerSourceEndpointId, Clusters::PowerSource::PowerSourceStatusEnum::kUnavailable);
-		Clusters::PowerSource::Attributes::BatPresent::Set(kPowerSourceEndpointId, false);
-		return;
-	}
+	int32_t voltageMv = measure_battery_voltage();
 
 	uint8_t percentage;
 
@@ -692,11 +787,16 @@ void AppTask::BatteryMeasureHandler()
 
 	LOG_INF("Battery: %" PRId32 " mV, %u%% (level %u)", voltageMv, percentage / 2, static_cast<uint8_t>(chargeLevel));
 
-	Clusters::PowerSource::Attributes::Status::Set(kPowerSourceEndpointId, Clusters::PowerSource::PowerSourceStatusEnum::kActive);
-	Clusters::PowerSource::Attributes::BatPresent::Set(kPowerSourceEndpointId, true);
+	PlatformMgr().LockChipStack();
+
 	Clusters::PowerSource::Attributes::BatVoltage::Set(kPowerSourceEndpointId, static_cast<uint32_t>(voltageMv));
 	Clusters::PowerSource::Attributes::BatPercentRemaining::Set(kPowerSourceEndpointId, percentage);
 	Clusters::PowerSource::Attributes::BatChargeLevel::Set(kPowerSourceEndpointId, chargeLevel);
+
+	//TODO Implement 
+	//Clusters::PowerSource::Attributes::BatReplacementNeeded
+
+	PlatformMgr().UnlockChipStack();
 }
 
 /// @brief Customises the PowerSource cluster.
@@ -706,6 +806,8 @@ void emberAfPowerSourceClusterInitCallback(chip::EndpointId endpoint)
 	LOG_INF("emberAfPowerSourceClusterInitCallback()");
 
 	Clusters::PowerSource::Attributes::Status::Set(endpoint, Clusters::PowerSource::PowerSourceStatusEnum::kActive);
+
+	Clusters::PowerSource::Attributes::BatPresent::Set(kPowerSourceEndpointId, true);
 
 	Clusters::PowerSource::Attributes::Order::Set(endpoint, 0);
 
