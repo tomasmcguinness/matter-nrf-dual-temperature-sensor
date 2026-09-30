@@ -48,8 +48,14 @@ k_timer sIndicatorTimer;
 k_timer sSensorTimer;
 k_timer sBatteryTimer;
 k_timer sFactoryResetTimer;
+k_timer sButtonDebounceTimer;
 
 bool mIndicatorState;
+
+// While the button is held the LED shows the button state, so the connectivity
+// blink patterns must leave it alone.
+//
+bool sButtonPressed;
 
 int32_t measure_battery_voltage();
 
@@ -65,6 +71,11 @@ int32_t measure_battery_voltage();
 // device anyway.
 //
 #define BATTERY_READ_INTERVAL_HOURS 24
+
+// The button is a bare mechanical switch with no hardware debouncing, so an
+// edge is only believed once the pin has been quiet for this long.
+//
+#define BUTTON_DEBOUNCE_MS 20
 
 // How long the button has to be held before the factory reset fires.
 //
@@ -216,6 +227,13 @@ void AppTask::MatterEventHandler(const ChipDeviceEvent *event, intptr_t data)
 		break;
 	}
 
+	// The button owns the LED while it is held.
+	//
+	if (sButtonPressed)
+	{
+		return;
+	}
+
 	if (isNetworkProvisioned)
 	{
 		LOG_INF("Network is provisioned!");
@@ -313,6 +331,15 @@ CHIP_ERROR AppTask::Init()
 
 	ReturnErrorOnFailure(Nrf::Matter::RegisterEventHandler(AppTask::MatterEventHandler, 0));
 
+	// Both button timers are initialised before ConfigureGPIO(), because that
+	// enables the button interrupt and the callback starts the debounce timer.
+	//
+	k_timer_init(&sFactoryResetTimer, &FactoryResetTimerCallback, nullptr);
+	k_timer_user_data_set(&sFactoryResetTimer, this);
+
+	k_timer_init(&sButtonDebounceTimer, &ButtonDebounceTimerCallback, nullptr);
+	k_timer_user_data_set(&sButtonDebounceTimer, this);
+
 	ConfigureGPIO();
 
 	k_timer_init(&sSensorTimer, &SensorTimerCallback, nullptr);
@@ -360,6 +387,15 @@ CHIP_ERROR AppTask::StartApp()
 
 void AppTask::ResetButtonCallback(const struct device *dev, struct gpio_callback *cb, gpio_port_pins_t pins)
 {
+	// This runs in interrupt context. It must do as close to nothing as
+	// possible - in particular no logging, because CONFIG_LOG_MODE_IMMEDIATE
+	// writes to the backend inline and doing that from an ISR can deadlock
+	// against a thread that is already inside the logger.
+	//
+	// Every edge just restarts the debounce timer, so the pin is only sampled
+	// once the switch has stopped bouncing.
+	//
+	k_timer_start(&sButtonDebounceTimer, K_MSEC(BUTTON_DEBOUNCE_MS), K_NO_WAIT);
 }
 
 /// @brief Fires once the button has been quiet for BUTTON_DEBOUNCE_MS. Still
@@ -374,6 +410,15 @@ void AppTask::ButtonDebounceTimerCallback(k_timer *timer)
 void AppTask::ResetButtonHandler()
 {
 	bool pressed = gpio_pin_get_dt(&reset_button) == 1;
+
+	// A bounce that settled back where it started is not a state change.
+	//
+	if (pressed == sButtonPressed)
+	{
+		return;
+	}
+
+	sButtonPressed = pressed;
 
 	if (pressed)
 	{
