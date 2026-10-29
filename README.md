@@ -2,11 +2,13 @@
 
 ![20251223_184336358_iOS](https://github.com/user-attachments/assets/d63748a7-c801-4c82-87ea-a7dafc8251de)
 
-This is my Matter Dual Temperature Sensor, powered by a nRF54L15
+This is my Matter Dual Temperature Sensor, powered by a nRF54L15.
 
-It supports two NTC thermistor probes, allowing for two temperature readings.
+## Probes
 
-It uses the standard Temperature Measurement cluster, presented on two endpoints, representing Probe 1 and Probe 2.
+- Supports two NTC thermistor probes connected via 2-pin JST-PH connectors.
+- Allowing for two temperature readings.
+- It uses the standard Temperature Measurement cluster, presented on two endpoints, representing Probe 1 and Probe 2.
 
 > [!CAUTION]
 > This is designed to work as an ICD (Intermittent Connected Device), so any controller that commissions it must support the ICD mechanism.
