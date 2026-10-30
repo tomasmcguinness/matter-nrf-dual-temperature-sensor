@@ -9,7 +9,7 @@ external pin instead of the supply rail.
 The device is battery powered only. Debug builds need no extra configuration; the `_release`
 variation removes logging and the shells.
 
-To build the custom PCB, use this command
+To build the custom PCB, use this command. This will include logging.
 
 ```
 west build -p -b nrf54l15dk/nrf54l15/cpuapp -- -DFILE_SUFFIX=minewsemi

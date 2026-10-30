@@ -2,7 +2,7 @@
 
 ![20251223_184336358_iOS](https://github.com/user-attachments/assets/d63748a7-c801-4c82-87ea-a7dafc8251de)
 
-This is my Matter Dual Temperature Sensor, powered by a nRF54L15
+This is my Matter Dual Temperature Sensor, powered by the Nordic Semiconductors nRF54L15.
 
 It supports two NTC thermistor probes, allowing for two temperature readings.
 
