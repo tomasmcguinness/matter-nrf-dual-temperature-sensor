@@ -57,10 +57,27 @@ bool mIndicatorState;
 //
 bool sButtonPressed;
 
-int32_t measure_battery_voltage();
+#define ZEPHYR_USER DT_PATH(zephyr_user)
 
-#if !DT_NODE_EXISTS(DT_PATH(zephyr_user)) || !DT_NODE_HAS_PROP(DT_PATH(zephyr_user), io_channels)
+#if !DT_NODE_EXISTS(ZEPHYR_USER) || !DT_NODE_HAS_PROP(ZEPHYR_USER, io_channels)
 #error "No suitable devicetree overlay specified"
+#endif
+
+// What the board provides is read from zephyr,user's io-channel-names:
+//
+//   probe_1 .. probe_4   one ADC channel per NTC divider (probe_1 and probe_2 are required)
+//   battery              the supply rail; present on the coin cell boards
+//
+// A board with a battery channel reads each divider against the measured supply, because
+// the coin cell drives VDD directly and the rail moves as it discharges. A board without
+// one (the USB powered XIAO nRF52840) must sample its probes ratiometrically - VDD/4
+// reference, gain 1/4 - so a raw count is the divider ratio itself.
+//
+#define HAS_ADC_CHANNEL(name) DT_PROP_HAS_NAME(ZEPHYR_USER, io_channels, name)
+#define HAS_BATTERY HAS_ADC_CHANNEL(battery)
+
+#if HAS_BATTERY
+int32_t measure_battery_voltage();
 #endif
 
 // Read the temperature sensors every minute.
@@ -104,32 +121,58 @@ constexpr uint16_t kCriticalVoltageMv = 2200;
 //
 constexpr uint8_t kMaxBatteryPercentage = 200;
 
-// The battery channel is deliberately left out of this array. It is owned by
-// battery.cpp, which picks it out of zephyr,user by name.
+// A probe's divider can be fed from its own GPIO, switched on only while it is sampled
+// (the coin cell boards), or sit on the supply rail permanently (the XIAO), in which
+// case there is no probe_N_divider_power node.
 //
-static const struct adc_dt_spec adc_channels[] = {
-	ADC_DT_SPEC_GET_BY_NAME(DT_PATH(zephyr_user), probe_1),
-	ADC_DT_SPEC_GET_BY_NAME(DT_PATH(zephyr_user), probe_2),
-	ADC_DT_SPEC_GET_BY_NAME(DT_PATH(zephyr_user), battery)
+#define DIVIDER_POWER_SPEC(n)                                                                          \
+	COND_CODE_1(DT_NODE_EXISTS(DT_NODELABEL(probe_##n##_divider_power)),                           \
+		    (static const struct gpio_dt_spec probe_##n##_divider_power =                        \
+			     GPIO_DT_SPEC_GET(DT_NODELABEL(probe_##n##_divider_power), gpios);),         \
+		    ())
+#define DIVIDER_POWER_PTR(n)                                                                           \
+	COND_CODE_1(DT_NODE_EXISTS(DT_NODELABEL(probe_##n##_divider_power)),                           \
+		    (&probe_##n##_divider_power), (nullptr))
+
+DIVIDER_POWER_SPEC(1)
+DIVIDER_POWER_SPEC(2)
+DIVIDER_POWER_SPEC(3)
+DIVIDER_POWER_SPEC(4)
+
+struct Probe
+{
+	struct adc_dt_spec adc;
+	const struct gpio_dt_spec *divider_power;
+	EndpointId endpoint;
 };
 
-#define PROBE_1_DIVIDER_POWER_NODE DT_NODELABEL(probe_1_divider_power)
-#define PROBE_2_DIVIDER_POWER_NODE DT_NODELABEL(probe_2_divider_power)
+// Endpoint N carries probe N's TemperatureMeasurement cluster.
+//
+static const Probe probes[] = {
+	{ADC_DT_SPEC_GET_BY_NAME(ZEPHYR_USER, probe_1), DIVIDER_POWER_PTR(1), 1},
+	{ADC_DT_SPEC_GET_BY_NAME(ZEPHYR_USER, probe_2), DIVIDER_POWER_PTR(2), 2},
+#if HAS_ADC_CHANNEL(probe_3)
+	{ADC_DT_SPEC_GET_BY_NAME(ZEPHYR_USER, probe_3), DIVIDER_POWER_PTR(3), 3},
+#endif
+#if HAS_ADC_CHANNEL(probe_4)
+	{ADC_DT_SPEC_GET_BY_NAME(ZEPHYR_USER, probe_4), DIVIDER_POWER_PTR(4), 4},
+#endif
+};
+
+constexpr size_t kProbeCount = ARRAY_SIZE(probes);
+
+#if HAS_BATTERY
+static const struct adc_dt_spec battery_channel = ADC_DT_SPEC_GET_BY_NAME(ZEPHYR_USER, battery);
+#endif
 
 #define INDICATOR_LED_NODE DT_ALIAS(indicator_led)
 #define RESET_BUTTON_NODE DT_ALIAS(reset_button)
-
-static const struct gpio_dt_spec probe_1_divider_power = GPIO_DT_SPEC_GET(PROBE_1_DIVIDER_POWER_NODE, gpios);
-static const struct gpio_dt_spec probe_2_divider_power = GPIO_DT_SPEC_GET(PROBE_2_DIVIDER_POWER_NODE, gpios);
 
 static const struct gpio_dt_spec indicator_led = GPIO_DT_SPEC_GET(INDICATOR_LED_NODE, gpios);
 static const struct gpio_dt_spec reset_button = GPIO_DT_SPEC_GET(RESET_BUTTON_NODE, gpios);
 
 constexpr EndpointId kLightEndpointId = 0;
 constexpr EndpointId kPowerSourceEndpointId = 0;
-constexpr EndpointId kProbe1EndpointId = 1;
-constexpr EndpointId kProbe2EndpointId = 2;
-constexpr EndpointId kDualTemperatureEndpointId = 3;
 
 Identify sIdentify = {kLightEndpointId, AppTask::IdentifyStartHandler, AppTask::IdentifyStopHandler, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator};
 
@@ -161,8 +204,10 @@ void AppTask::SensorTimerCallback(k_timer *timer)
 /// @param timer
 void AppTask::BatteryTimerCallback(k_timer *timer)
 {
+#if HAS_BATTERY
 	Nrf::PostTask([]
 				  { AppTask::BatteryMeasureHandler(); });
+#endif
 }
 
 void AppTask::IndicatorTimerCallback(k_timer *timer)
@@ -346,9 +391,11 @@ CHIP_ERROR AppTask::Init()
 	k_timer_user_data_set(&sSensorTimer, this);
 	k_timer_start(&sSensorTimer, K_MSEC(1000), K_MSEC(SENSOR_READ_INTERVAL));
 
+#if HAS_BATTERY
 	k_timer_init(&sBatteryTimer, &BatteryTimerCallback, nullptr);
 	k_timer_user_data_set(&sBatteryTimer, this);
 	k_timer_start(&sBatteryTimer, K_MSEC(1000), K_HOURS(BATTERY_READ_INTERVAL_HOURS));
+#endif
 
 	// Turn on the indicator LED for one second.
 	// Gives an indication that the device is alive!
@@ -450,7 +497,9 @@ void AppTask::ResetButtonHandler()
 		Nrf::PostTask([]
 					  {
 						  AppTask::SensorMeasureHandler();
+#if HAS_BATTERY
 						  AppTask::BatteryMeasureHandler();
+#endif
 					  });
 
 		k_timer_start(&sFactoryResetTimer, K_SECONDS(FACTORY_RESET_HOLD_SECONDS), K_NO_WAIT);
@@ -469,50 +518,57 @@ void AppTask::ConfigureGPIO()
 {
 	int err = 0;
 
-	if (!gpio_is_ready_dt(&probe_1_divider_power))
+	for (size_t i = 0U; i < kProbeCount; i++)
 	{
-		LOG_ERR("Cannot configure Divider 1 Power");
-		return;
+		const struct gpio_dt_spec *power = probes[i].divider_power;
+
+		if (power == nullptr)
+		{
+			continue;
+		}
+
+		if (!gpio_is_ready_dt(power))
+		{
+			LOG_ERR("Cannot configure Divider %d Power", (int)i + 1);
+			return;
+		}
+
+		err = gpio_pin_configure_dt(power, GPIO_OUTPUT_INACTIVE);
+		if (err != 0)
+		{
+			LOG_ERR("Configuring Divider %d Power pin failed (err: %d)", (int)i + 1, err);
+			return;
+		}
 	}
 
-	err = gpio_pin_configure_dt(&probe_1_divider_power, GPIO_OUTPUT_INACTIVE);
-	if (err != 0)
+	for (size_t i = 0U; i < kProbeCount; i++)
 	{
-		LOG_ERR("Configuring Divider 1 Power pin failed (err: %d)", err);
-		return;
-	}
-
-	if (!gpio_is_ready_dt(&probe_2_divider_power))
-	{
-		LOG_ERR("Cannot configure Divider 2 Power");
-	 	return;
-	}
-
-	err = gpio_pin_configure_dt(&probe_2_divider_power, GPIO_OUTPUT_INACTIVE);
-	if (err != 0)
-	{
-		LOG_ERR("Configuring Divider 2 Power pin failed (err: %d)", err);
-	 	return;
-	}
-
-	for (size_t i = 0U; i < ARRAY_SIZE(adc_channels); i++)
-	{
-		if (!device_is_ready(adc_channels[i].dev))
+		if (!device_is_ready(probes[i].adc.dev))
 		{
 			LOG_ERR("ADC controller device not ready");
 			return;
 		}
 
-		err = adc_channel_setup_dt(&adc_channels[i]);
+		err = adc_channel_setup_dt(&probes[i].adc);
 
 		if (err < 0)
 		{
-			LOG_ERR("Could not setup channel #%d (%d)", i, err);
+			LOG_ERR("Could not setup probe %d's channel (%d)", (int)i + 1, err);
 			return;
 		}
 
-		LOG_INF("Successfully setup ADC channel #%d", i);
+		LOG_INF("Successfully setup ADC channel for probe %d", (int)i + 1);
 	}
+
+#if HAS_BATTERY
+	err = adc_channel_setup_dt(&battery_channel);
+
+	if (err < 0)
+	{
+		LOG_ERR("Could not setup the battery channel (%d)", err);
+		return;
+	}
+#endif
 
 	if (!gpio_is_ready_dt(&indicator_led))
 	{
@@ -577,6 +633,34 @@ struct adc_sequence adc_sequence = {
 	.calibrate = true,
 };
 
+/// @brief Takes one sample from an ADC channel.
+/// @return 0, or a negative errno.
+static int sample_channel(const struct adc_dt_spec &channel, int32_t &raw)
+{
+	int err = adc_sequence_init_dt(&channel, &adc_sequence);
+
+	if (err < 0)
+	{
+		LOG_ERR("Could not initialise ADC channel %d (%d)", channel.channel_id, err);
+		return err;
+	}
+
+	err = adc_read_dt(&channel, &adc_sequence);
+
+	if (err < 0)
+	{
+		LOG_ERR("Could not read ADC channel %d (%d)", channel.channel_id, err);
+		return err;
+	}
+
+	// Single-ended samples can come back a count or two below zero; the SAADC returns them
+	// as a signed 16 bit value.
+	//
+	raw = static_cast<int16_t>(adc_sequence_buf);
+	return 0;
+}
+
+#if HAS_BATTERY
 /// @brief Reads one probe's divider and returns the thermistor resistance in ohms.
 ///
 /// There is no fixed reference to divide against: the divider is fed from a GPIO
@@ -593,36 +677,23 @@ struct adc_sequence adc_sequence = {
 ///
 /// @param supply_mv the divider supply, sampled while the divider is energised.
 /// @return the resistance in ohms, or a negative errno.
-double read_probe_resistance(int probe_number, int32_t supply_mv)
+double read_probe_resistance(int probe_number, const struct adc_dt_spec &channel, int32_t supply_mv)
 {
-	int channel = probe_number - 1;
-
-	adc_dt_spec adc_channel = adc_channels[channel];
-
-	int err = adc_sequence_init_dt(&adc_channel, &adc_sequence);
+	int32_t raw;
+	int err = sample_channel(channel, raw);
 
 	if (err < 0)
 	{
-		LOG_ERR("Could not initialise ADC%d (%d)", channel, err);
 		return err;
 	}
 
-	err = adc_read_dt(&adc_channel, &adc_sequence);
-
-	if (err < 0)
-	{
-		LOG_ERR("Could not read ADC%d (%d)", channel, err);
-		return err;
-	}
-
-	int32_t raw = (int32_t)adc_sequence_buf;
 	int32_t val_mv = raw;
 
-	err = adc_raw_to_millivolts_dt(&adc_channel, &val_mv);
+	err = adc_raw_to_millivolts_dt(&channel, &val_mv);
 
 	if (err < 0)
 	{
-		LOG_ERR("ADC%d value in mV not available (%d)", channel, err);
+		LOG_ERR("Probe %d value in mV not available (%d)", probe_number, err);
 		return err;
 	}
 
@@ -641,6 +712,44 @@ double read_probe_resistance(int probe_number, int32_t supply_mv)
 
 	return (double)val_mv * SERIESRESISTOR / (double)(supply_mv - val_mv);
 }
+#else
+/// @brief Reads one probe's divider and returns the thermistor resistance in ohms.
+///
+/// The channel's reference is VDD/4 with gain 1/4, so full scale is VDD - the same rail
+/// that feeds the divider. The raw count is then the divider ratio directly:
+///
+///     raw / 2^resolution = Rt / (SERIESRESISTOR + Rt)
+///       =>  Rt = SERIESRESISTOR * raw / (2^resolution - raw)
+///
+/// and neither the supply voltage nor the reference's accuracy enters into it.
+///
+/// @return the resistance in ohms, or a negative errno.
+double read_probe_resistance(int probe_number, const struct adc_dt_spec &channel)
+{
+	int32_t raw;
+	int err = sample_channel(channel, raw);
+
+	if (err < 0)
+	{
+		return err;
+	}
+
+	const int32_t full_scale = 1 << channel.resolution;
+
+	LOG_INF("PROBE #%d: raw %" PRId32 " of %" PRId32, probe_number, raw, full_scale);
+
+	// An unplugged probe leaves the node at the rail, and a shorted one pulls it to
+	// ground. Neither is a temperature.
+	//
+	if (raw <= 0 || raw >= full_scale - 1)
+	{
+		LOG_ERR("Probe %d is out of range - check that it is connected", probe_number);
+		return -EIO;
+	}
+
+	return (double)raw * SERIESRESISTOR / (double)(full_scale - raw);
+}
+#endif
 
 /// @brief Converts a thermistor resistance to degrees Celsius, using the
 /// B-parameter form of the Steinhart-Hart equation.
@@ -657,17 +766,23 @@ double resistance_to_celsius(double resistance)
 	return steinhart;
 }
 
-/// @brief Powers one probe's divider, samples it, and converts the result to the
-/// hundredths of a degree that Matter reports.
+/// @brief Samples one probe and converts the result to the hundredths of a degree
+/// that Matter reports, powering its divider first if it has a switch.
 /// @return true if the reading is usable, false if it should not be published.
-bool measure_probe(int probe_number, const struct gpio_dt_spec &divider_power, int16_t &out_value)
+bool measure_probe(int probe_number, const Probe &probe, int16_t &out_value)
 {
-	// Switch on the power pin. Let the power stay on for a short period of
-	// time so the voltage stabalises.
-	//
-	gpio_pin_set_dt(&divider_power, 1);
-	k_sleep(K_MSEC(PROBE_SETTLE_MS));
+	if (probe.divider_power != nullptr)
+	{
+		// Switch on the power pin. Let the power stay on for a short period of
+		// time so the voltage stabalises.
+		//
+		gpio_pin_set_dt(probe.divider_power, 1);
+		k_sleep(K_MSEC(PROBE_SETTLE_MS));
+	}
 
+	double resistance = 0;
+
+#if HAS_BATTERY
 	// Sampled here, inside the powered window, rather than reused from the daily
 	// battery reading. The divider draws ~150 uA and a coin cell's ESR rises as it
 	// ages, so the rail sags a little under that load - measuring the supply while
@@ -678,22 +793,27 @@ bool measure_probe(int probe_number, const struct gpio_dt_spec &divider_power, i
 
 	if (supply_mv < 0)
 	{
-	 	LOG_ERR("Probe %d: supply voltage unavailable (%" PRId32 ")", probe_number, supply_mv);
-		return false;
+		LOG_ERR("Probe %d: supply voltage unavailable (%" PRId32 ")", probe_number, supply_mv);
+		resistance = -EIO;
 	}
+	else
+	{
+		LOG_INF("Probe %d: VDD %" PRId32 " mV", probe_number, supply_mv);
+		resistance = read_probe_resistance(probe_number, probe.adc, supply_mv);
+	}
+#else
+	resistance = read_probe_resistance(probe_number, probe.adc);
+#endif
 
-	LOG_INF("Probe %d: VDD %" PRId32 " mV", probe_number, supply_mv);
-
-	double resistance = 0;
-	bool valid = false;
-
-	resistance = read_probe_resistance(probe_number, supply_mv);
-	valid = resistance > 0;
+	bool valid = resistance > 0;
 
 	// Switched off on the error paths too - an energised divider is a permanent
 	// ~150 uA on a coin cell.
 	//
-	gpio_pin_set_dt(&divider_power, 0);
+	if (probe.divider_power != nullptr)
+	{
+		gpio_pin_set_dt(probe.divider_power, 0);
+	}
 
 	if (!valid)
 	{
@@ -716,33 +836,23 @@ bool measure_probe(int probe_number, const struct gpio_dt_spec &divider_power, i
 	LOG_INF("Probe %d: %" PRId32 " ohms, %s%d.%02d C", probe_number, (int32_t)resistance,
 			(out_value < 0 && whole == 0) ? "-" : "", whole, fraction);
 
- 	return true;
+	return true;
 }
 
+#if HAS_BATTERY
 int32_t measure_battery_voltage()
 {
-	int channel = 2;
+	int32_t raw;
+	int err = sample_channel(battery_channel, raw);
 
-	adc_dt_spec adc_channel = adc_channels[channel];
-
-	int err = adc_sequence_init_dt(&adc_channel, &adc_sequence);
-
-	if (err < 0) {
-		LOG_ERR("Could not initialise the battery ADC sequence (%d)", err);
+	if (err < 0)
+	{
 		return err;
 	}
 
-	err = adc_read_dt(&adc_channel, &adc_sequence);
-
-	if (err < 0) {
-		LOG_ERR("Could not read the battery ADC (%d)", err);
-		return err;
-	}
-
-	int32_t raw = static_cast<int32_t>(adc_sequence_buf);
 	int32_t voltageMv = raw;
 
-	err = adc_raw_to_millivolts_dt(&adc_channel, &voltageMv);
+	err = adc_raw_to_millivolts_dt(&battery_channel, &voltageMv);
 
 	if (err < 0) {
 		LOG_ERR("Battery value in mV not available (%d)", err);
@@ -753,39 +863,39 @@ int32_t measure_battery_voltage()
 
 	return voltageMv;
 }
+#endif
 
 void AppTask::SensorMeasureHandler()
 {
-	int16_t probe_1_temperature;
-	int16_t probe_2_temperature;
+	int16_t temperatures[kProbeCount];
+	bool valid[kProbeCount];
 
-	bool probe_1_valid = measure_probe(1, probe_1_divider_power, probe_1_temperature);
-	bool probe_2_valid = measure_probe(2, probe_2_divider_power, probe_2_temperature);
+	// Every probe is sampled before any is published, so a controller reading the set
+	// sees one sampling pass rather than a mix of old and new values.
+	//
+	for (size_t i = 0; i < kProbeCount; i++)
+	{
+		valid[i] = measure_probe((int)i + 1, probes[i], temperatures[i]);
+	}
 
-	// With both readings taken, update both of the clusters. MeasuredValue is
-	// nullable, and null is what the spec has for "no usable reading" - leaving the
-	// last good value in place would look like a live temperature.
+	// MeasuredValue is nullable, and null is what the spec has for "no usable
+	// reading" - leaving the last good value in place would look like a live
+	// temperature.
 	//
 	PlatformMgr().LockChipStack();
 
 	LOG_INF("Publishing temperatures...");
 
-	if (probe_1_valid)
+	for (size_t i = 0; i < kProbeCount; i++)
 	{
-		Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(kProbe1EndpointId, probe_1_temperature);
-	}
-	else
-	{
-		Clusters::TemperatureMeasurement::Attributes::MeasuredValue::SetNull(kProbe1EndpointId);
-	}
-
-	if (probe_2_valid)
-	{
-		Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(kProbe2EndpointId, probe_2_temperature);
-	}
-	else
-	{
-		Clusters::TemperatureMeasurement::Attributes::MeasuredValue::SetNull(kProbe2EndpointId);
+		if (valid[i])
+		{
+			Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(probes[i].endpoint, temperatures[i]);
+		}
+		else
+		{
+			Clusters::TemperatureMeasurement::Attributes::MeasuredValue::SetNull(probes[i].endpoint);
+		}
 	}
 
 	// Return to this once I figure out custom clusters
@@ -796,6 +906,7 @@ void AppTask::SensorMeasureHandler()
 	PlatformMgr().UnlockChipStack();
 }
 
+#if HAS_BATTERY
 void AppTask::BatteryMeasureHandler()
 {
 	int32_t voltageMv = measure_battery_voltage();
@@ -844,6 +955,8 @@ void AppTask::BatteryMeasureHandler()
 	PlatformMgr().UnlockChipStack();
 }
 
+#endif // HAS_BATTERY
+
 /// @brief Customises the PowerSource cluster.
 /// @param endpoint
 void emberAfPowerSourceClusterInitCallback(chip::EndpointId endpoint)
@@ -852,6 +965,13 @@ void emberAfPowerSourceClusterInitCallback(chip::EndpointId endpoint)
 
 	Clusters::PowerSource::Attributes::Status::Set(endpoint, Clusters::PowerSource::PowerSourceStatusEnum::kActive);
 
+#if !HAS_BATTERY
+	// USB powered: the data model (src/zap_quad) declares the WIRED feature, not BAT.
+	//
+	Clusters::PowerSource::Attributes::Order::Set(endpoint, 0);
+	Clusters::PowerSource::Attributes::Description::Set(endpoint, chip::CharSpan::fromCharString("USB"));
+	Clusters::PowerSource::Attributes::WiredCurrentType::Set(endpoint, Clusters::PowerSource::WiredCurrentTypeEnum::kDc);
+#else
 	Clusters::PowerSource::Attributes::BatPresent::Set(kPowerSourceEndpointId, true);
 
 	Clusters::PowerSource::Attributes::Order::Set(endpoint, 0);
@@ -861,6 +981,7 @@ void emberAfPowerSourceClusterInitCallback(chip::EndpointId endpoint)
 	Clusters::PowerSource::Attributes::BatReplaceability::Set(endpoint, Clusters::PowerSource::BatReplaceabilityEnum::kUserReplaceable);
 
 	Clusters::PowerSource::Attributes::BatReplacementNeeded::Set(endpoint, false);
+#endif
 }
 
 /// @brief Required by MATTER_PLUGINS_INIT. The DualTemperatureMeasurement cluster is

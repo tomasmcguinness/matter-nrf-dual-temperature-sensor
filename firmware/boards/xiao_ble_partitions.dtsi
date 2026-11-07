@@ -1,0 +1,69 @@
+/*
+ * Flash layout for the Seeed XIAO nRF52840 running MCUboot instead of the factory UF2
+ * bootloader. Shared by the application and MCUboot overlays, and kept in step with
+ * pm_static_xiao_ble_nrf52840.yml.
+ *
+ * The board's own nrf52840_partition_uf2_sdv7.dtsi reserves 156 kB at the bottom of flash for
+ * a SoftDevice this firmware does not use, and calls the UF2 bootloader region at 0xf4000
+ * "boot_partition". MCUboot links itself into whatever boot_partition is, so the UF2 layout
+ * has to go before it can be used.
+ *
+ * Programming this firmware over SWD erases the UF2 bootloader. To go back to UF2, reflash the
+ * Adafruit nRF52 bootloader.
+ */
+
+/delete-node/ &code_partition;
+/delete-node/ &storage_partition;
+/delete-node/ &boot_partition;
+/delete-node/ &reserved_partition_0;
+
+&flash0 {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		boot_partition: partition@0 {
+			label = "mcuboot";
+			reg = <0x00000000 0x00008000>;
+		};
+
+		slot0_partition: partition@8000 {
+			label = "image-0";
+			reg = <0x00008000 0x000ef000>;
+		};
+
+		factory_partition: partition@f7000 {
+			label = "factory-data";
+			reg = <0x000f7000 0x00001000>;
+		};
+
+		storage_partition: partition@f8000 {
+			label = "storage";
+			reg = <0x000f8000 0x00008000>;
+		};
+	};
+};
+
+/* The MCUboot secondary slot lives on the 2 MB QSPI flash (mcuboot_secondary in the PM file).
+ * MCUboot's build requires the slot1_partition label to exist.
+ */
+&p25q16h {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		slot1_partition: partition@0 {
+			label = "image-1";
+			reg = <0x00000000 0x000ef000>;
+		};
+	};
+};
+
+/ {
+	chosen {
+		zephyr,code-partition = &slot0_partition;
+		nordic,pm-ext-flash = &p25q16h;
+	};
+};

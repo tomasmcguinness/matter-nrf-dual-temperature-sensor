@@ -1,0 +1,12 @@
+/*
+ * Seeed XIAO nRF52840. Replaces the board's UF2 layout, whose "boot_partition" is the UF2
+ * bootloader at 0xf4000, with the MCUboot one the application uses.
+ */
+
+#include "../../../boards/xiao_ble_partitions.dtsi"
+
+/ {
+	chosen {
+		zephyr,code-partition = &boot_partition;
+	};
+};

@@ -27,6 +27,83 @@ To compile for the nRF54L15-DK, use this command
 west build -p -b nrf54l15dk/nrf54l15/cpuapp
 ```
 
+## Four probe build (Seeed XIAO nRF52840)
+
+The same application builds for a Seeed XIAO nRF52840 reading **four** NTC probes, powered
+over USB. The data model is `src/zap_quad/template.zap`: endpoints 1-4 each carry a
+`TemperatureMeasurement` cluster labelled "Probe 1" to "Probe 4", endpoint 0's PowerSource is
+**wired** (DC, "USB") rather than battery, and there is no ICD Management cluster.
+
+```
+west build -p -b xiao_ble -d build_xiao
+west flash -d build_xiao
+```
+
+### Wiring
+
+Each probe is a divider from the XIAO's 3V3 pin:
+
+```
+3V3 --[ 10k 0.1% ]--+------> A0 / A1 / A2 / A3
+                    |
+                   NTC   (2-pin screw terminal)
+                    |
+GND ----------------+------- 100 nF from the A-pin node to GND
+```
+
+| Probe | Pin | nRF52840 |
+|---|---|---|
+| 1 | A0 | P0.02 / AIN0 |
+| 2 | A1 | P0.03 / AIN1 |
+| 3 | A2 | P0.28 / AIN4 |
+| 4 | A3 | P0.29 / AIN5 |
+| Factory reset button (optional) | D6 to GND | P1.11 |
+
+The indicator is the XIAO's green LED. The series resistor must match the NTC's 25 C
+resistance (`SERIESRESISTOR`, `THERMISTORNOMINAL` and `BCOEFFICIENT` in `src/app_task.cpp`).
+
+### How it differs from the coin cell boards
+
+- **Ratiometric reading.** There is no `battery` channel and no `probe_N_divider_power` node in
+  `boards/xiao_ble.overlay`. The dividers sit on 3V3 permanently and each channel uses the VDD/4
+  reference at gain 1/4, so full scale is the divider's own supply and
+  `Rt = R * raw / (4096 - raw)`. The supply is never measured and regulator drift cancels.
+  `src/app_task.cpp` picks the method from the devicetree: a board with a `battery` channel keeps
+  the measured-supply method.
+- **Always on.** ICD is off and it runs as a full Thread device (FTD), so readings reach the
+  controller as soon as they are taken - every minute, all four probes sampled in one pass.
+- **USB console.** Logs and the Matter shell are on the USB CDC ACM port (deferred logging),
+  as well as RTT.
+
+### Flash layout and programming
+
+The XIAO ships with the Adafruit UF2 bootloader, whose layout reserves 156 kB for a SoftDevice
+and leaves no room for MCUboot or Matter factory data. This build replaces it:
+
+| Partition | Address | Size |
+|---|---|---|
+| MCUboot | 0x00000 | 32 kB |
+| Application (with MCUboot header) | 0x08000 | 956 kB |
+| Factory data | 0xf7000 | 4 kB |
+| Settings | 0xf8000 | 32 kB |
+| OTA secondary slot | QSPI 0x000000 | 956 kB |
+
+It is defined in `pm_static_xiao_ble_nrf52840.yml` and mirrored in
+`boards/xiao_ble_partitions.dtsi` (used by both the app and MCUboot); keep the two in step.
+
+Program it over SWD, using the pads on the underside of the XIAO (SWDIO, SWCLK, GND, 3V3). An
+nRF DK's "Debug out" header works as the probe. **This erases the UF2 bootloader**; to go back
+to drag-and-drop programming, reflash the Adafruit nRF52 bootloader. After the first flash,
+updates can go over Matter OTA (`build_xiao/dfu_application.zip`).
+
+To regenerate the four probe data model after editing it:
+
+```
+west zap-generate -z src/zap_quad/template.zap -o src/zap_quad/zap-generated
+```
+
+(with the same environment as described under "Regenerating the data model").
+
 ## Battery measurement
 
 The coin cell drives VDD directly - there is no LDO and no divider - so the battery voltage is

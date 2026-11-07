@@ -1,0 +1,50 @@
+# Seeed XIAO nRF52840 with MCUboot. Based on pm_static_nrf52840dk_nrf52840.yml from the NCS
+# Matter template, with two differences:
+#
+#  - MCUboot gets 0x8000 rather than 0x7000. With the XIAO's board defaults (MPU, stack
+#    protection, LFXO two-stage start) it overflowed 0x7000 by a few hundred bytes.
+#  - The secondary slot is on the board's 2 MB P25Q16H QSPI flash, not the DK's MX25R64.
+#
+# Keep in step with boards/xiao_ble_partitions.dtsi.
+mcuboot:
+  address: 0x0
+  size: 0x8000
+  region: flash_primary
+mcuboot_pad:
+  address: 0x8000
+  size: 0x200
+app:
+  address: 0x8200
+  size: 0xeee00
+mcuboot_primary:
+  orig_span: &id001
+  - mcuboot_pad
+  - app
+  span: *id001
+  address: 0x8000
+  size: 0xef000
+  region: flash_primary
+mcuboot_primary_app:
+  orig_span: &id002
+  - app
+  span: *id002
+  address: 0x8200
+  size: 0xeee00
+factory_data:
+  address: 0xf7000
+  size: 0x1000
+  region: flash_primary
+settings_storage:
+  address: 0xf8000
+  size: 0x8000
+  region: flash_primary
+mcuboot_secondary:
+  address: 0x0
+  size: 0xef000
+  device: P25Q16H
+  region: external_flash
+external_flash:
+  address: 0xef000
+  size: 0x111000
+  device: P25Q16H
+  region: external_flash

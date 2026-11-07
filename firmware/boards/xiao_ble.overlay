@@ -1,0 +1,92 @@
+/*
+ * Seeed XIAO nRF52840: four NTC probes, USB powered.
+ *
+ * Wiring (see README "Four probe build"):
+ *
+ *   3V3 --[10k]--+-- A0/A1/A2/A3
+ *                |
+ *               NTC   (screw terminal)
+ *                |
+ *   GND ---------+-- 100 nF from the A-pin node to GND
+ *
+ *   Optional factory reset button: D6 to GND.
+ */
+
+#include "xiao_ble_partitions.dtsi"
+
+/ {
+	buttons {
+		compatible = "gpio-keys";
+		button0: button_0 {
+			gpios = <&gpio1 11 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;	/* D6 */
+			label = "Reset Button";
+		};
+	};
+
+	aliases {
+		indicator-led = &led1;	/* green, active low */
+		reset-button = &button0;
+	};
+
+	/* No "battery" channel and no probe_N_divider_power nodes: the dividers sit on the
+	 * 3V3 rail permanently, and each probe is read against VDD itself (see &adc below), so
+	 * the supply never has to be measured.
+	 */
+	zephyr,user {
+		io-channels = <&adc 0>, <&adc 1>, <&adc 2>, <&adc 3>;
+		io-channel-names = "probe_1", "probe_2", "probe_3", "probe_4";
+	};
+};
+
+&adc {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	/* Ratiometric: the reference is VDD/4 and the gain 1/4, so full scale is VDD - the
+	 * same 3V3 rail that feeds the dividers. A reading is then the divider ratio itself,
+	 * Rt = R * raw / (4096 - raw), and drift in the regulator cancels out.
+	 *
+	 * The source impedance is ~5k (10k against a 10k NTC near 25 C) with 100 nF across the
+	 * input, well inside what the default 10 us acquisition time handles.
+	 */
+	channel@0 {
+		reg = <0>;
+		zephyr,gain = "ADC_GAIN_1_4";
+		zephyr,reference = "ADC_REF_VDD_1_4";
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,input-positive = <NRF_SAADC_AIN0>;	/* A0, P0.02 */
+		zephyr,resolution = <12>;
+		zephyr,oversampling = <8>;
+	};
+
+	channel@1 {
+		reg = <1>;
+		zephyr,gain = "ADC_GAIN_1_4";
+		zephyr,reference = "ADC_REF_VDD_1_4";
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,input-positive = <NRF_SAADC_AIN1>;	/* A1, P0.03 */
+		zephyr,resolution = <12>;
+		zephyr,oversampling = <8>;
+	};
+
+	channel@2 {
+		reg = <2>;
+		zephyr,gain = "ADC_GAIN_1_4";
+		zephyr,reference = "ADC_REF_VDD_1_4";
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,input-positive = <NRF_SAADC_AIN4>;	/* A2, P0.28 */
+		zephyr,resolution = <12>;
+		zephyr,oversampling = <8>;
+	};
+
+	channel@3 {
+		reg = <3>;
+		zephyr,gain = "ADC_GAIN_1_4";
+		zephyr,reference = "ADC_REF_VDD_1_4";
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,input-positive = <NRF_SAADC_AIN5>;	/* A3, P0.29 */
+		zephyr,resolution = <12>;
+		zephyr,oversampling = <8>;
+	};
+};

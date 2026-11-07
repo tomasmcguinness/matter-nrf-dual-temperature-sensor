@@ -78,13 +78,17 @@ namespace chip
             {
                 labelPtr = "name";
 
-                if (mEndpoint == 1)
+                // Endpoint N carries probe N. The four probe build (XIAO nRF52840) adds
+                // endpoints 3 and 4.
+                static const char *const kProbeNames[] = {"Probe 1", "Probe 2", "Probe 3", "Probe 4"};
+
+                if (mEndpoint >= 1 && mEndpoint <= 4)
                 {
-                    valuePtr = "Probe 1";
+                    valuePtr = kProbeNames[mEndpoint - 1];
                 }
                 else
                 {
-                    valuePtr = "Probe 2";
+                    err = CHIP_ERROR_INVALID_ARGUMENT;
                 }
             }
             else
